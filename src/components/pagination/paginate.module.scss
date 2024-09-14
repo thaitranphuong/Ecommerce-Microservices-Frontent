@@ -1,0 +1,42 @@
+.wrapper {
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+
+        .pageList {
+            .pageItem {
+                padding: 10px;
+                margin-right: 5px;
+                border: 1px solid var(--primary-color);
+                color: var(--primary-color);
+                border-radius: 4px;
+                background-color: #fff;
+                cursor: pointer;
+            }
+
+            .pageItem.active {
+                border: none;
+                color: #fff;
+                background-color: var(--primary-color);
+            }
+
+            .pageItem.disabled {
+                border: none;
+                color: #fff;
+                background-color: #ccc;
+                cursor: auto;
+            }
+
+            .three_dot {
+                position: relative;
+                padding: 10px;
+                font-size: 18px;
+                color: var(--primary-color);
+                bottom: -10px;
+                margin-right: 2px;
+            }
+        }
+    }
+}

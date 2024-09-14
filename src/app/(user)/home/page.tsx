@@ -1,0 +1,144 @@
+import Icon from '@mdi/react';
+import {
+    mdiArrowRight,
+    mdiCommentTextOutline,
+    mdiCurrencyUsd,
+    mdiHeadphones,
+    mdiSaleOutline,
+    mdiTruckOutline,
+} from '@mdi/js';
+
+import Banner from './banner/banner';
+import Slide from './slide/slide';
+import Image from 'next/image';
+
+export default function Home() {
+    return (
+        <div>
+            <Banner />
+            <div className="flex justify-center items-center my-7 flex-wrap">
+                <div className="m-2 w-[308px] h-[186px] border-solid border-zinc-200 border-[1px] rounded-sm flex flex-col justify-center items-center">
+                    <Icon path={mdiSaleOutline} size={2} />
+                    <div className="mt-5 font-bold text-gray-500">SIÊU KHUYẾN MÃI</div>
+                    <div className="text-gray-500 mt-4">Giảm giá lên đến 50%</div>
+                </div>
+                <div className="m-2 w-[308px] h-[186px] border-solid border-zinc-200 border-[1px] rounded-sm flex flex-col justify-center items-center">
+                    <Icon path={mdiTruckOutline} size={2} />
+                    <div className="mt-5 font-bold text-gray-500">MIỄN PHÍ VẬN CHUYỂN</div>
+                    <div className="text-gray-500 mt-4">Phạm vi trong khoảng 10km</div>
+                </div>
+                <div className="m-2 w-[308px] h-[186px] border-solid border-zinc-200 border-[1px] rounded-sm flex flex-col justify-center items-center">
+                    <Icon path={mdiHeadphones} size={2} />
+                    <div className="mt-5 font-bold text-gray-500">HỖ TRỢ TẬN TÂM</div>
+                    <div className="text-gray-500 mt-4">Bất cứ lúc nào bạn cần</div>
+                </div>
+                <div className="m-2 w-[308px] h-[186px] border-solid border-zinc-200 border-[1px] rounded-sm flex flex-col justify-center items-center">
+                    <Icon path={mdiCurrencyUsd} size={2} />
+                    <div className="mt-5 font-bold text-gray-500">THANH TOÁN AN TOÀN</div>
+                    <div className="text-gray-500 mt-4">Các cổng thanh toán uy tín</div>
+                </div>
+            </div>
+            <div className="my-20 text-center">
+                <span className="font-bold text-2xl pb-4" style={{ borderBottom: '1px solid #000' }}>
+                    SẢN PHẨM BÁN CHẠY
+                </span>
+                <div className="text-gray-500 text-sm mt-8">Bạn sẽ không thất vọng khi lựa chọn</div>
+            </div>
+            <div className="flex justify-start items-center mx-[80px] flex-wrap">
+                <Slide arr={[1, 2, 3, 4, 5, 6]}></Slide>
+            </div>
+            <div className="my-20 text-center">
+                <span className="font-bold text-2xl pb-4" style={{ borderBottom: '1px solid #000' }}>
+                    SẢN PHẨM MỚI
+                </span>
+                <div className="text-gray-500 text-sm mt-8">Bạn sẽ không thất vọng khi lựa chọn</div>
+            </div>
+            <div className="flex justify-start items-center mx-[80px] flex-wrap">
+                <Slide arr={[1, 2, 3, 4, 5, 6]}></Slide>
+            </div>
+            <div className="my-20 text-center">
+                <span className="font-bold text-2xl pb-4" style={{ borderBottom: '1px solid #000' }}>
+                    BLOG MỚI ĐĂNG
+                </span>
+                <div className="text-gray-500 text-sm mt-8">Những bài blog về các sản phẩm mới nhất</div>
+            </div>
+            <div className="flex justify-center items-center flex-wrap">
+                <div className=" cursor-pointer group mx-5">
+                    <div className="w-[400px] h-[260px] overflow-hidden">
+                        <Image
+                            src={require('~/../public/images/1.jpeg')}
+                            alt=""
+                            width={10000}
+                            height={10000}
+                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
+                        />
+                    </div>
+                    <div className="flex justify-start items-center mt-3">
+                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
+                        <div className="mr-1 text-gray-800">
+                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                        </div>
+                        <div className="text-gray-800">1</div>
+                    </div>
+                    <div className="font-bold group-hover:primary-color">
+                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
+                    </div>
+                    <div className="text-xs mt-6 group-hover:primary-color">
+                        XEM THÊM
+                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
+                    </div>
+                </div>
+                <div className=" cursor-pointer group mx-5">
+                    <div className="w-[400px] h-[260px] overflow-hidden">
+                        <Image
+                            src={require('~/../public/images/1.jpeg')}
+                            alt=""
+                            width={10000}
+                            height={10000}
+                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
+                        />
+                    </div>
+                    <div className="flex justify-start items-center mt-3">
+                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
+                        <div className="mr-1 text-gray-800">
+                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                        </div>
+                        <div className="text-gray-800">1</div>
+                    </div>
+                    <div className="font-bold group-hover:primary-color">
+                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
+                    </div>
+                    <div className="text-xs mt-6 group-hover:primary-color">
+                        XEM THÊM
+                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
+                    </div>
+                </div>
+                <div className=" cursor-pointer group mx-5">
+                    <div className="w-[400px] h-[260px] overflow-hidden">
+                        <Image
+                            src={require('~/../public/images/1.jpeg')}
+                            alt=""
+                            width={10000}
+                            height={10000}
+                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
+                        />
+                    </div>
+                    <div className="flex justify-start items-center mt-3">
+                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
+                        <div className="mr-1 text-gray-800">
+                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                        </div>
+                        <div className="text-gray-800">1</div>
+                    </div>
+                    <div className="font-bold group-hover:primary-color">
+                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
+                    </div>
+                    <div className="text-xs mt-6 group-hover:primary-color">
+                        XEM THÊM
+                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
