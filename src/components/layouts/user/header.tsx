@@ -65,12 +65,29 @@ function Header() {
                     </div>
                 </div>
                 <div className="flex uppercase">
-                    <Link href={'/'} className="mr-8">
-                        Chu shop
-                    </Link>
-                    <div className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]">
-                        ĐĂNG XUẤT
-                    </div>
+                    {1 == 1 ? (
+                        <>
+                            <Link href={'/auth/login'} className="mr-8">
+                                ĐĂNG KÝ
+                            </Link>
+                            <Link
+                                href={'/auth/login'}
+                                className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]"
+                            >
+                                ĐĂNG NHẬP
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link href={'/auth/acount/info'} className="mr-8">
+                                Chu shop
+                            </Link>
+                            <div className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]">
+                                ĐĂNG XUẤT
+                            </div>
+                        </>
+                    )}
+
                     <div className="relative before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]">
                         <Image src={vi} alt=""></Image>
                     </div>
@@ -136,7 +153,7 @@ function Header() {
                             1
                         </div>
                     </Link>
-                    <Link href="/auth/account" className="ml-2 mb-px">
+                    <Link href="/auth/account/info" className="ml-2 mb-px">
                         <Image src={avatar} alt="" className="w-[25px] h-[25px] object-cover rounded-full"></Image>
                     </Link>
                 </div>

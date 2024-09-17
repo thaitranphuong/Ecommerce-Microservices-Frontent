@@ -20,9 +20,19 @@ const config: Config = {
                 showheader: {
                     from: { top: '-85px' },
                 },
+                changeColor: {
+                    '0%': { color: 'red' },
+                    '25%': { color: 'blue' },
+                    '50%': { color: 'green' },
+                    '75%': { color: 'orange' },
+                    '100%': { color: 'purple' },
+                },
             },
             animation: {
                 showheader: 'showheader 0.4s linear',
+                'color-change1': 'changeColor 2.8s infinite',
+                'color-change2': 'changeColor 3.1s infinite',
+                'color-change3': 'changeColor 2.5s infinite',
             },
         },
     },
