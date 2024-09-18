@@ -1,0 +1,19 @@
+.wrapper {
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    float: right;
+    width: 110px;
+    height: 40px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #166a39;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 1.4rem;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #0f4626;
+    }
+}

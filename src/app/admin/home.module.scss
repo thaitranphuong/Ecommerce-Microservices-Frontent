@@ -1,0 +1,98 @@
+.wrapper {
+    min-height: calc(100vh - 72px * 2);
+    padding: 42px;
+
+    .title {
+        font-size: 3rem;
+    }
+
+    .description {
+        color: #545454;
+    }
+
+    .cards {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        flex-wrap: wrap;
+        margin-top: 45px;
+        margin-bottom: 25px;
+
+        .card {
+            min-width: 22%;
+            height: 115px;
+            background-color: #fff;
+            box-shadow: 0 1px 1px 1px #ccc;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 20px;
+
+            .card_top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 28px;
+
+                .card_left {
+                    .card_left_quantity {
+                        font-size: 3rem;
+                        color: #000;
+                    }
+
+                    .card_title {
+                        font-size: 1.4rem;
+                        color: #727272;
+                    }
+                }
+            }
+
+            .card_bottom {
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px solid #ebebeb;
+                padding: 5px 28px;
+                font-size: 1.2rem;
+                color: #727272;
+            }
+
+            .card_right {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                color: #fff;
+            }
+        }
+    }
+
+    .chart_wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .order {
+        width: 350px;
+    }
+
+    .chart_title {
+        font-weight: 700;
+    }
+
+    .revenue_month {
+        display: inline-block;
+        width: 700px;
+    }
+
+    .revenue_year {
+        margin-top: 100px;
+    }
+
+    .picker_input {
+        padding: 10px;
+        margin-top: 10px;
+    }
+}

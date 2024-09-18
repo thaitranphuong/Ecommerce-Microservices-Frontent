@@ -1,0 +1,54 @@
+.wrapper {
+    width: 277px;
+    height: calc(100vh - 72px);
+    background-color: #fff;
+    overflow-y: scroll;
+    animation: show 0.2s linear;
+    margin-left: -277px;
+    transition: all 0.15s linear;
+    border-right: 1px solid #ccc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    .title {
+        margin-top: 45px;
+        margin-left: 24px;
+        font-size: 1.8rem;
+        font-weight: 400;
+        margin-bottom: 30px;
+    }
+
+    .item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 46px;
+        width: 100%;
+        padding-left: 26px;
+        color: #7e7e7e;
+        text-decoration: none;
+
+        &:hover {
+            background-color: #ddd;
+            cursor: pointer;
+        }
+
+        .icon {
+            margin-right: 17px;
+        }
+
+        .label {
+            font-weight: 500;
+        }
+    }
+
+    .active {
+        color: #000;
+        background-color: #fafafa;
+    }
+    
+}
+
+
+.show {
+    margin-left: 0;
+}

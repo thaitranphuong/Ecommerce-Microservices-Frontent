@@ -1,0 +1,99 @@
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 72px;
+    width: 100%;
+    background-color: #212121;
+    color: #fff;
+
+    .left {
+        display: flex;
+        align-items: center;
+
+        .menu {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #212121;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin-bottom: -2px;
+
+            &:hover {
+                background-color: #383838;
+            }
+        }
+
+        .title {
+            margin-left: 25px;
+        }
+    }
+
+    .right {
+        position: relative;
+        margin-right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+        background-color: #212121;
+
+        &:hover {
+            background-color: #383838;
+        }
+
+        .avatar {
+            width: 4rem;
+            height: 4rem;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .window {
+            position: absolute;
+            top: 70px;
+            right: 0;
+            min-width: 200px;
+            border-radius: 5px;
+            background-color: #fff;
+            z-index: 1;
+            box-shadow: 0 0 5px 5px #ddd;
+            cursor: auto;
+
+            .window_top {
+                padding: 5px 0;
+            }
+
+            .window_bottom {
+                padding: 5px 0;
+                border-top: 1px solid #ddd;
+            }
+
+            .window_item {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                width: 100%;
+                height: 50px;
+                cursor: pointer;
+                padding: 0 20px;
+                font-size: 1.4rem;
+                text-decoration: none;
+                color: #232323;
+
+                &:hover {
+                    background-color: #ddd;
+                }
+            }
+        }
+    }
+}
