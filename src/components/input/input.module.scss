@@ -1,0 +1,21 @@
+.wrapper {
+    padding: 0 5px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    .label {
+        font-size: 1.6rem;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .input {
+        padding: 10px;
+        font-size: 1.6rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        background-color: #fefefe;
+        margin-bottom: 10px;
+    }
+}
+

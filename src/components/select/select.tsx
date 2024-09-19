@@ -8,15 +8,15 @@ function Select({
     value,
     name,
 }: {
-    label: any;
-    width: any;
-    array: any;
-    onChange: any;
-    value: any;
-    name: any;
+    label?: any;
+    width?: any;
+    array?: any;
+    onChange?: any;
+    value?: any;
+    name?: any;
 }) {
     return (
-        <div style={{ width: `${width ?? '50%'}` }} className={styles.wrapper}>
+        <div style={{ width: `${width}` }} className={styles.wrapper}>
             <div className={styles.label}>{label}</div>
             <select className={styles.input} onChange={onChange} value={value} name={name}>
                 <option key="" value={''}>

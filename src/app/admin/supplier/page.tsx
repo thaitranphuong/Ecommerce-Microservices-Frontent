@@ -6,7 +6,7 @@ import { mdiPen, mdiTrashCan } from '@mdi/js';
 import Wrapper from '~/components/layouts/admin/wrapper';
 import ExcelButton from '~/components/excel-button/excel-button';
 import Pagination from '~/components/pagination/pagination';
-import SearchBar from '~/components/search-bar';
+import SearchBar from '~/components/search-bar/search-bar';
 import AddButton from '~/components/add-button/add-button';
 import styles from './supplier.module.scss';
 import Link from 'next/link';

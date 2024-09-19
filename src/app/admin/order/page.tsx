@@ -6,7 +6,7 @@ import { mdiDeveloperBoard, mdiPen, mdiTrashCan } from '@mdi/js';
 import Wrapper from '~/components/layouts/admin/wrapper';
 import ExcelButton from '~/components/excel-button/excel-button';
 import Pagination from '~/components/pagination/pagination';
-import SearchBar from '~/components/search-bar';
+import SearchBar from '~/components/search-bar/search-bar';
 import AddButton from '~/components/add-button/add-button';
 import styles from './order.module.scss';
 import Link from 'next/link';
@@ -47,7 +47,6 @@ function Order() {
                 <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Select width="300px" array={array} label="" onChange={{}} value={''} name={''} />
                     <div>
-                        <AddButton to="/admin/add-order" />
                         <ExcelButton onClick={{}} />
                     </div>
                 </div>
@@ -83,7 +82,7 @@ function Order() {
                             <td>
                                 <div className="flex justify-center">
                                     <Link
-                                        href={'/admin/order/view-order/' + 1}
+                                        href={'/admin/edit-order/' + 1}
                                         style={{ color: 'orange', cursor: 'pointer' }}
                                     >
                                         <Icon path={mdiDeveloperBoard} size={2} />
