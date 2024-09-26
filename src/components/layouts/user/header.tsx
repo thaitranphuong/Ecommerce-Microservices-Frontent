@@ -11,6 +11,7 @@ import Icon from '@mdi/react';
 import { mdiCartVariant, mdiMessageText } from '@mdi/js';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { getUser, logout } from '~/utils/localstorage';
 
 function Header() {
     const [active, setActive] = useState(1);
@@ -65,7 +66,7 @@ function Header() {
                     </div>
                 </div>
                 <div className="flex uppercase">
-                    {1 == 1 ? (
+                    {!getUser() ? (
                         <>
                             <Link href={'/auth/login'} className="mr-8">
                                 ĐĂNG KÝ
@@ -80,9 +81,12 @@ function Header() {
                     ) : (
                         <>
                             <Link href={'/auth/acount/info'} className="mr-8">
-                                Chu shop
+                                {getUser()?.name}
                             </Link>
-                            <div className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]">
+                            <div
+                                onClick={() => logout()}
+                                className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]"
+                            >
                                 ĐĂNG XUẤT
                             </div>
                         </>

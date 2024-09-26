@@ -17,7 +17,14 @@ function Category() {
     return (
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý danh mục" detail="Danh sách danh mục">
-                <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                    }}
+                >
                     <SearchBar onChange={{}} value={''} placeholder="Tìm kiếm theo tên danh mục" />
                     <div>
                         <AddButton to="/admin/add-category" />
@@ -25,7 +32,12 @@ function Category() {
                     </div>
                 </div>
                 <table
-                    style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
+                    style={{
+                        border: '1px solid #ccc',
+                        width: '100%',
+                        borderCollapse: 'collapse',
+                        margin: '20px 5px',
+                    }}
                 >
                     <thead>
                         <tr>
