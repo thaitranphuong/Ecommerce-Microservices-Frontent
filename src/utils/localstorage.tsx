@@ -1,3 +1,5 @@
+'use client';
+
 export const getToken = () => {
     const token = window.localStorage.getItem('token');
     if (!!token) return JSON.parse(token);

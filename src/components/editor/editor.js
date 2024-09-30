@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import styles from './editor.module.scss';
+import { config } from '~/utils/config';
+import { getToken } from '~/utils/localstorage';
 
 function Editor({ label, content, onChange, name }) {
     const htmlContent = { __html: content };
@@ -13,17 +15,17 @@ function Editor({ label, content, onChange, name }) {
                     const body = new FormData();
                     loader.file.then((file) => {
                         body.append('image', file);
-                        fetch(`http://localhost:8080/product/image-fulldescription`, {
+                        fetch(`${config.baseURL}/blog/upload-file`, {
                             method: 'POST',
                             headers: {
-                                // Authorization: !!getToken() ? 'Bearer ' + getToken() : '',
+                                Authorization: !!getToken() ? 'Bearer ' + getToken() : '',
                             },
                             body: body,
                         })
                             .then((res) => res.json())
                             .then((res) => {
                                 resolve({
-                                    default: `http://localhost:8080/getimage/ckeditor_images/${res.name}`,
+                                    default: res.path,
                                 });
                                 console.log(res);
                             })

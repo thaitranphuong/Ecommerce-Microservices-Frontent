@@ -9,6 +9,7 @@ function Input({
     placeholder,
     name,
     value,
+    multiple = false,
 }: {
     label?: any;
     width?: any;
@@ -18,6 +19,7 @@ function Input({
     placeholder?: any;
     name?: any;
     value?: any;
+    multiple?: boolean;
 }) {
     return (
         <div style={{ width: `${width}` }} className={styles.wrapper}>
@@ -31,9 +33,11 @@ function Input({
                     className={styles.input}
                     // code={''}
                     value={value}
+                    multiple={multiple}
                 />
             ) : (
                 <input
+                    multiple={multiple}
                     name={name}
                     value={value}
                     onChange={onChange}

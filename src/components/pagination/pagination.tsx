@@ -16,10 +16,9 @@ function Paginate({ page, setPage, totalPage }: { page: number; setPage: any; to
         });
     }, [totalPage]);
 
-    const handleChangePage = (event: any) => {
-        const pageValue = event.target.value;
+    const handleChangePage = (pageValue: number) => {
         if (pageValue >= 1 && pageValue <= totalPage) {
-            //handle change page
+            setPage(pageValue);
         }
     };
 
@@ -29,7 +28,7 @@ function Paginate({ page, setPage, totalPage }: { page: number; setPage: any; to
                 <div className={styles.pageList}>
                     {totalPage > 0 && (
                         <button
-                            onClick={(e) => handleChangePage(e)}
+                            onClick={(e: any) => handleChangePage(e.target.value)}
                             className={clsx(styles.pageItem, { [styles.disabled]: page === 1 })}
                             value={page - 1}
                         >
@@ -41,7 +40,7 @@ function Paginate({ page, setPage, totalPage }: { page: number; setPage: any; to
                         if (item <= page + 2 && item >= page - 2) {
                             return (
                                 <button
-                                    onClick={(e) => handleChangePage(e)}
+                                    onClick={(e: any) => handleChangePage(e.target.value)}
                                     key={item}
                                     className={clsx(styles.pageItem, { [styles.active]: page === item })}
                                     value={item}
@@ -54,7 +53,7 @@ function Paginate({ page, setPage, totalPage }: { page: number; setPage: any; to
                     {page < totalPage - 2 && <span className={styles.three_dot}>...</span>}
                     {totalPage > 0 && (
                         <button
-                            onClick={(e) => handleChangePage(e)}
+                            onClick={(e: any) => handleChangePage(e.target.value)}
                             className={clsx(styles.pageItem, { [styles.disabled]: page === totalPage })}
                             value={page + 1}
                         >

@@ -25,6 +25,7 @@ const ImageModal = ({ imageUrl, style }: { imageUrl: any; style: any }) => {
                     width={1000}
                     height={1000}
                     className="object-cover w-[50px] h-[50px]"
+                    priority
                 />
             )}
 
@@ -37,7 +38,14 @@ const ImageModal = ({ imageUrl, style }: { imageUrl: any; style: any }) => {
                         height: '100%',
                     }}
                 >
-                    <Image className="w-full h-full object-cover" src={imageUrl} alt="" width={1000} height={1000} />
+                    <Image
+                        className="w-[90%] h-[90%] object-cover z-50"
+                        src={imageUrl}
+                        alt=""
+                        width={500}
+                        height={500}
+                        priority
+                    />
                     <button
                         style={{
                             backgroundColor: 'red',

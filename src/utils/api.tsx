@@ -1,3 +1,5 @@
+'use client';
+
 import { config } from './config';
 import { getToken } from './localstorage';
 

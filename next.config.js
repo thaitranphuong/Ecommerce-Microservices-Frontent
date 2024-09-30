@@ -13,6 +13,12 @@ module.exports = {
                 port: '5001',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                port: '',
+                pathname: '/**',
+            },
         ],
     },
     async redirects() {

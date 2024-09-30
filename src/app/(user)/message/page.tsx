@@ -4,30 +4,30 @@ import clsx from 'clsx';
 import Icon from '@mdi/react';
 import { mdiSend } from '@mdi/js';
 import { useEffect, useRef, useState } from 'react';
-// import { over } from 'stompjs';
-// import SockJS from 'sockjs-client';
+import { over } from 'stompjs';
+import SockJS from 'sockjs-client';
+import Image from 'next/image';
 
 import styles from './message.module.scss';
-import Image from 'next/image';
-// import { getToken, getUser } from '../../../utils/localstorage';
-// import { config } from '../../../utils/config';
+import { getToken, getUser } from '~/utils/localstorage';
+import { config } from '~/utils/config';
 
 var stompClient: any = null;
 var connected = false;
 var subscribed = false;
 function Message() {
     const ref: any = useRef();
-    const [privateChats, setPrivateChats] = useState(new Map());
+    const [privateChats, setPrivateChats] = useState<any>(new Map());
     let [listAdmins, setListAdmins] = useState([]);
     const [tab, setTab] = useState(1);
     const [userData, setUserData] = useState({
-        userId: '1', //getUser().id,
-        userName: '1', //getUser().name,
+        userId: getUser().id,
+        userName: getUser().name,
         receiverId: '',
         connected: false,
         message: '',
-        avatar: '1', //getUser().avatar,
-        role: '1', //getUser().role,
+        avatar: getUser().avatar,
+        roles: getUser().roles,
     });
 
     useEffect(() => {
@@ -36,66 +36,68 @@ function Message() {
 
     useEffect(() => {
         connect();
+        // onConnected();
     }, []);
 
     const connect = () => {
-        // let Sock = new SockJS(config.baseURL + '/ws');
-        // stompClient = over(Sock);
-        // stompClient.connect({}, onConnected, onError);
+        let Sock = new SockJS('https://localhost:5003' + '/ws');
+        stompClient = over(Sock);
+        stompClient.connect({}, onConnected, onError);
     };
 
     const onConnected = async () => {
-        // if (connected === false) {
-        //     connected = true;
-        //     let url = '';
-        //     userData.role === 'customer'
-        //         ? (url = config.baseURL + '/user/get-all-admin')
-        //         : (url = config.baseURL + '/user/get-all-customer');
-        //     const options = {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             Authorization: 'Bearer ' + getToken(),
-        //         },
-        //     };
-        //     fetch(url, options)
-        //         .then((res) => res.json())
-        //         .then((res) => {
-        //             res.forEach((user) => {
-        //                 privateChats.set(user.id, []);
-        //                 setPrivateChats(new Map(privateChats));
-        //                 setListAdmins(res);
-        //             });
-        //         })
-        //         .then(async () => {
-        //             [...privateChats.keys()].forEach((receiverId) => {
-        //                 fetch(config.baseURL + `/message/get-all/${userData.userId}/${receiverId}`, options)
-        //                     .then((res) => res.json())
-        //                     .then((res) => {
-        //                         res.forEach((item) => {
-        //                             const chatMessage = {
-        //                                 content: item.content,
-        //                                 isRead: item.isRead,
-        //                                 createdTime: item.createdTime,
-        //                                 senderId: item.senderId,
-        //                                 receiverId: item.receiverId,
-        //                                 senderName: item.senderName,
-        //                                 avatar: item.avatar,
-        //                             };
-        //                             privateChats.get(receiverId).push(chatMessage);
-        //                         });
-        //                         setPrivateChats(new Map(privateChats));
-        //                         if (!subscribed) {
-        //                             stompClient.subscribe(
-        //                                 '/user-chat/' + userData.userId + '/private',
-        //                                 onPrivateMessage,
-        //                             );
-        //                             subscribed = true;
-        //                         }
-        //                     });
-        //             });
-        //         });
-        // }
+        if (connected === false) {
+            connected = true;
+            let url = '';
+            userData.roles.includes('admin')
+                ? (url = config.baseURL + '/user/get-all-customer')
+                : (url = config.baseURL + '/user/get-all-admin');
+
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + getToken(),
+                },
+            };
+            fetch(url, options)
+                .then((res) => res.json())
+                .then((res) => {
+                    res.forEach((user: any) => {
+                        privateChats.set(user.id, []);
+                        setPrivateChats(new Map(privateChats));
+                        setListAdmins(res);
+                    });
+                })
+                .then(async () => {
+                    [...privateChats.keys()].forEach((receiverId) => {
+                        fetch(config.baseURL + `/message/get-all/${userData.userId}/${receiverId}`, options)
+                            .then((res) => res.json())
+                            .then((res) => {
+                                res.forEach((item: any) => {
+                                    const chatMessage = {
+                                        content: item.content,
+                                        isRead: item.isRead,
+                                        createdTime: item.createdTime,
+                                        senderId: item.senderId,
+                                        receiverId: item.receiverId,
+                                        senderName: item.senderName,
+                                        avatar: item.avatar,
+                                    };
+                                    privateChats.get(receiverId).push(chatMessage);
+                                });
+                                setPrivateChats(new Map(privateChats));
+                                if (!subscribed) {
+                                    stompClient.subscribe(
+                                        '/user-chat/' + userData.userId + '/private',
+                                        onPrivateMessage,
+                                    );
+                                    subscribed = true;
+                                }
+                            });
+                    });
+                });
+        }
     };
 
     const onError = (err: any) => {
@@ -114,33 +116,35 @@ function Message() {
     };
 
     const sendPrivateValue = () => {
-        // if (userData.message)
-        //     if (stompClient) {
-        //         var currentTime = new Date();
-        //         var day = currentTime.getDate();
-        //         var month = currentTime.getMonth() + 1;
-        //         var year = currentTime.getFullYear();
-        //         var hour = currentTime.getHours() <= 12 ? currentTime.getHours() : '0' + (currentTime.getHours() - 12);
-        //         var minute = currentTime.getMinutes();
-        //         var second = currentTime.getSeconds();
-        //         var formattedDate = hour + ':' + minute + ':' + second + ' ' + day + '/' + month + '/' + year;
-        //         var chatMessage = {
-        //             senderId: userData.userId,
-        //             receiverId: tab,
-        //             content: userData.message,
-        //             isRead: false,
-        //             createdTime: formattedDate,
-        //             senderName: userData.userName,
-        //             avatar: userData.avatar,
-        //         };
-        //         if (userData.userId !== tab) {
-        //             privateChats.get(tab).push({ ...chatMessage });
-        //             setPrivateChats(new Map(privateChats));
-        //             chatMessage.createdTime = new Date();
-        //         }
-        //         stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
-        //         setUserData({ ...userData, message: '' });
-        //     }
+        if (userData.message)
+            if (stompClient) {
+                var currentTime = new Date();
+                var day = currentTime.getDate();
+                var month = currentTime.getMonth() + 1;
+                var year = currentTime.getFullYear();
+                var hour = currentTime.getHours() <= 12 ? currentTime.getHours() : '0' + (currentTime.getHours() - 12);
+                var minute = currentTime.getMinutes();
+                var second = currentTime.getSeconds();
+                var formattedDate = hour + ':' + minute + ':' + second + ' ' + day + '/' + month + '/' + year;
+
+                var chatMessage: any = {
+                    senderId: userData.userId,
+                    receiverId: tab,
+                    content: userData.message,
+                    isRead: false,
+                    createdTime: formattedDate,
+                    senderName: userData.userName,
+                    avatar: userData.avatar,
+                };
+
+                if (userData.userId !== tab) {
+                    privateChats.get(tab).push({ ...chatMessage });
+                    setPrivateChats(new Map(privateChats));
+                    chatMessage.createdTime = new Date();
+                }
+                stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
+                setUserData({ ...userData, message: '' });
+            }
     };
 
     return (
@@ -151,51 +155,65 @@ function Message() {
                         <input className={styles.search_input} placeholder="Tìm tên admin" />
                     </div>
                     <div className={styles.user_list}>
-                        {/* {listAdmins.map((item) => (
-                            
-                        ))} */}
-                        <div
-                            key={1}
-                            onClick={() => setTab(1)}
-                            className={clsx(styles.user, { [styles.active]: 1 === tab })}
-                        >
-                            <div className={styles.avatar_container}>
-                                <Image
-                                    className={styles.avatar_image}
-                                    width={10000}
-                                    height={10000}
-                                    src={require('~/../public/images/avatar.png')}
-                                    alt="Avatar"
-                                />
-                            </div>
-                            <div className={styles.info}>
-                                <div className={styles.info_top}>
-                                    <div className={styles.info_name}>Thai Tran</div>
-                                    <div className={styles.info_time}>10/10/2022</div>
+                        {listAdmins.map((item: any) => (
+                            <div
+                                key={item.id}
+                                onClick={() => setTab(item.id)}
+                                className={clsx(styles.user, { [styles.active]: item.id === tab })}
+                            >
+                                <div className={styles.avatar_container}>
+                                    <Image
+                                        className={styles.avatar_image}
+                                        src={
+                                            item.avatar
+                                                ? config.baseURL + '/getimage/users/' + item.avatar
+                                                : require('~/../public/images/avatar.png')
+                                        }
+                                        alt="Avatar"
+                                        width={1000}
+                                        height={1000}
+                                    />
                                 </div>
-                                <div className={styles.info_bottom}>
-                                    <div className={styles.last_message}>AAAAAAAAAAAA</div>
-                                    {/* <div className={styles.unseen_message}>5</div> */}
+                                <div className={styles.info}>
+                                    <div className={styles.info_top}>
+                                        <div className={styles.info_name}>{item.name}</div>
+                                        <div className={styles.info_time}>
+                                            {privateChats.get(item.id).length > 0 &&
+                                                privateChats.get(item.id)[privateChats.get(item.id).length - 1]
+                                                    .createdTime}
+                                        </div>
+                                    </div>
+                                    <div className={styles.info_bottom}>
+                                        <div className={styles.last_message}>
+                                            {privateChats.get(item.id).length > 0 &&
+                                                privateChats.get(item.id)[privateChats.get(item.id).length - 1].content}
+                                        </div>
+                                        {/* <div className={styles.unseen_message}>5</div> */}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
                 <div className={styles.right}>
                     <div ref={ref} className={styles.message_container}>
-                        {/* {!!privateChats.get(tab) &&
-                            privateChats.get(tab).map((item, index) => (
+                        {!!privateChats.get(tab) &&
+                            privateChats.get(tab).map((item: any, index: any) => (
                                 <div
                                     className={clsx(styles.message_item, {
                                         [styles.message_item_seft]: userData.userId === item.senderId,
                                     })}
                                 >
                                     <Image
-                                        width={10000}
-                                        height={10000}
-                                        className={clsx('h-[40px] w-[40px] rounded-full object-cover')}
-                                        src={require('~/../public/images/avatar.png')}
+                                        className={styles.message_avatar}
+                                        src={
+                                            item.avatar
+                                                ? config.baseURL + '/getimage/users/' + item.avatar
+                                                : require('~/../public/images/avatar.png')
+                                        }
                                         alt="Avatar"
+                                        width={1000}
+                                        height={1000}
                                     />
                                     <div className={styles.message_block}>
                                         <div className={styles.message_name}>{item.senderName}</div>
@@ -203,65 +221,7 @@ function Message() {
                                         <div className={styles.message_time}>{item.createdTime}</div>
                                     </div>
                                 </div>
-                            ))} */}
-                        <div className={clsx(styles.message_item, styles.message_item_seft)}>
-                            <Image
-                                src={require('~/../public/images/avatar.png')}
-                                alt="Avatar"
-                                width={10000}
-                                height={10000}
-                                className={clsx('h-[40px] w-[40px] rounded-full object-cover')}
-                            />
-                            <div className={styles.message_block}>
-                                <div className={styles.message_name}>Thai Tran</div>
-                                <div className={styles.message_content}>AAAAAAAAAAAAASDASDASDAS</div>
-                                <div className={styles.message_time}>10/10/2022</div>
-                            </div>
-                        </div>
-                        <div className={clsx(styles.message_item)}>
-                            <Image
-                                src={require('~/../public/images/avatar.png')}
-                                alt="Avatar"
-                                width={10000}
-                                height={10000}
-                                className={clsx('h-[40px] w-[40px] rounded-full object-cover')}
-                            />
-                            <div className={styles.message_block}>
-                                <div className={styles.message_name}>Thai Tran</div>
-                                <div className={styles.message_content}>AAAAAAAAAAAAASDASDASDAS</div>
-                                <div className={styles.message_time}>10/10/2022</div>
-                            </div>
-                        </div>
-                        <div className={clsx(styles.message_item)}>
-                            <Image
-                                src={require('~/../public/images/avatar.png')}
-                                alt="Avatar"
-                                width={10000}
-                                height={10000}
-                                className={clsx('h-[40px] w-[40px] rounded-full object-cover')}
-                            />
-                            <div className={styles.message_block}>
-                                <div className={styles.message_name}>Thai Tran</div>
-                                <div className={styles.message_content}>
-                                    AAAAAAAAAAAAASDASDASDAS as asd ad asd sdasdasd asda
-                                </div>
-                                <div className={styles.message_time}>10/10/2022</div>
-                            </div>
-                        </div>
-                        <div className={clsx(styles.message_item)}>
-                            <Image
-                                src={require('~/../public/images/avatar.png')}
-                                alt="Avatar"
-                                width={10000}
-                                height={10000}
-                                className={clsx('h-[40px] w-[40px] rounded-full object-cover')}
-                            />
-                            <div className={styles.message_block}>
-                                <div className={styles.message_name}>Thai Tran</div>
-                                <div className={styles.message_content}>Xin chào!!!😍😍😍😍😍</div>
-                                <div className={styles.message_time}>10/10/2022</div>
-                            </div>
-                        </div>
+                            ))}
                     </div>
                     <div className={styles.message_bar}>
                         <input
@@ -271,7 +231,7 @@ function Message() {
                             value={userData.message}
                         />
                         <button onClick={sendPrivateValue} className={styles.message_send_btn}>
-                            <Icon path={mdiSend} size={1.5} />
+                            <Icon path={mdiSend} size={2.5} />
                         </button>
                     </div>
                 </div>
