@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 import SlideShow from '~/components/slide-show/slide-show';

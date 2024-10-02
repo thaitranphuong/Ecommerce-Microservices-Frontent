@@ -1,11 +1,29 @@
-// Function to format the date as dd/MM/yyyy
-function formatDate(date: string) {
-    const dateObj = new Date(date);
-    let day = String(dateObj.getDate()).padStart(2, '0');
-    let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    let year = dateObj.getFullYear();
-
-    return `${day}/${month}/${year}`;
+function convertFromISODate(isoString: string) {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
 }
 
-export default formatDate;
+function convertFromISODateWithTime(isoString: string) {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const seconds = ('0' + date.getSeconds()).slice(-2);
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+function convertToISODate(dateString: string) {
+    // Chuyển chuỗi 'yyyy-MM-dd' thành đối tượng Date
+    const date = new Date(dateString);
+    // Đặt giờ, phút, giây mặc định là 00:00:00.000
+    date.setUTCHours(0, 0, 0, 0);
+    // Chuyển đổi sang định dạng ISO với múi giờ UTC
+    return date.toISOString();
+}
+
+export { convertFromISODate, convertFromISODateWithTime, convertToISODate };

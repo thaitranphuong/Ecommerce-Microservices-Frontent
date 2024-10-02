@@ -3,7 +3,7 @@ import { ColorRing } from 'react-loader-spinner';
 function SavingModal() {
     return (
         <div>
-            <div className="fixed w-full h-full bg-slate-900 opacity-20 top-0 left-0 z-10"></div>
+            <div className="fixed w-full h-full bg-slate-300 opacity-50 top-0 left-0 z-10"></div>
             <div className="fixed flex justify-center items-center w-full h-full top-0 left-0 z-10">
                 <div className="text-[50px] text-white">Đang lưu...</div>
                 <ColorRing

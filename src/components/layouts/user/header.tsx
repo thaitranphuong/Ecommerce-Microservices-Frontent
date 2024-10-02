@@ -3,15 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
+import React from 'react';
+import dynamic from 'next/dynamic';
 
-import vi from '~/../public/images/vi.svg';
 import logo from '~/../public/images/logo.png';
 import avatar from '~/../public/images/avatar.png';
 import Icon from '@mdi/react';
 import { mdiCartVariant, mdiMessageText } from '@mdi/js';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { getUser, logout } from '~/utils/localstorage';
+const HeaderLoginLink = dynamic(() => import('~/components/layouts/user/header-login-link'), { ssr: false });
 
 function Header() {
     const [active, setActive] = useState(1);
@@ -65,37 +66,7 @@ function Header() {
                         EMAIL: THESTYLESHOP@GMAIL.COM
                     </div>
                 </div>
-                <div className="flex uppercase">
-                    {!getUser() ? (
-                        <>
-                            <Link href={'/auth/login'} className="mr-8">
-                                ĐĂNG KÝ
-                            </Link>
-                            <Link
-                                href={'/auth/login'}
-                                className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]"
-                            >
-                                ĐĂNG NHẬP
-                            </Link>
-                        </>
-                    ) : (
-                        <>
-                            <Link href={'/auth/acount/info'} className="mr-8">
-                                {getUser()?.name}
-                            </Link>
-                            <div
-                                onClick={() => logout()}
-                                className="relative cursor-pointer mr-8 before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]"
-                            >
-                                ĐĂNG XUẤT
-                            </div>
-                        </>
-                    )}
-
-                    <div className="relative before:content:-[*] before:absolute before:block before:w-px before:h-4 before:bg-[#000] before:left-[-15px]">
-                        <Image src={vi} alt=""></Image>
-                    </div>
-                </div>
+                <HeaderLoginLink />
             </div>
             <div
                 className={clsx('h-[80px] flex justify-between items-center px-[120px] bg-white', {

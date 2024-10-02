@@ -15,7 +15,7 @@ import Excel from '~/components/excel/excel';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
 import { User as _User } from '~/data/data-type';
-import formatDate from '~/utils/date-formatter';
+import { convertFromISODate } from '~/utils/date-formatter';
 
 function User() {
     const [users, setUsers] = useState<_User[]>([]);
@@ -39,25 +39,16 @@ function User() {
         setPage(1);
     }, [email]);
 
-    const handleHide = async (index: number) => {
-        const user = { ...users[index], enabled: false };
-        const result = await api.putRequest('/user', user);
+    const handleShowHide = async (id: any, enabled: boolean) => {
+        let result = await api.getRequest(`/user/showhide/${id}`);
+        console.log(result);
         if (result && result.statusCode === 200) {
             render();
-            notify('Vô hiệu hóa tài khoản thành công');
+            if (enabled) notify('Vô hiệu hóa tài khoản thành công');
+            else notify('Kích hoạt tài khoản thành công');
         } else {
-            alert('Vô hiệu hóa tài khoản không thành công');
-        }
-    };
-
-    const handleShow = async (index: number) => {
-        const user = { ...users[index], enabled: true };
-        const result = await api.putRequest('/user', user);
-        if (result && result.statusCode === 200) {
-            render();
-            notify('Khôi phục tài khoản thành công');
-        } else {
-            notifyError('Khôi phục tài khoản không thành công');
+            if (enabled) notifyError('Vô hiệu hóa tài khoản không thành công');
+            else notifyError('Kích hoạt tài khoản không thành công');
         }
     };
 
@@ -86,7 +77,7 @@ function User() {
                         placeholder="Tìm kiếm theo tên người dùng"
                     />
                     <div>
-                        <AddButton to="/admin/user/add-user" />
+                        <AddButton to="/admin/add-user" />
                         <ExcelButton onClick={handleExportFile} />
                     </div>
                 </div>
@@ -113,14 +104,14 @@ function User() {
                                     <td>{item.email}</td>
                                     <td>{item.name}</td>
                                     <td>{item.phone}</td>
-                                    <td>{formatDate(item.birthDay)}</td>
+                                    <td>{convertFromISODate(item.birthDay)}</td>
                                     <td>{item.gender === true ? 'Nam' : 'Nữ'}</td>
                                     <td>
                                         {item.roles.map((role: string, index: number) => (
-                                            <div key={role}>
+                                            <span key={role}>
                                                 {index > 0 && ', '}
                                                 {role}
-                                            </div>
+                                            </span>
                                         ))}
                                     </td>
                                     <td>
@@ -133,14 +124,14 @@ function User() {
                                             </Link>
                                             {item.enabled ? (
                                                 <span
-                                                    onClick={() => handleHide(index)}
+                                                    onClick={() => handleShowHide(item.id, item.enabled)}
                                                     style={{ color: 'green', cursor: 'pointer' }}
                                                 >
                                                     <Icon path={mdiEye} size={1.5} />
                                                 </span>
                                             ) : (
                                                 <span
-                                                    onClick={() => handleShow(index)}
+                                                    onClick={() => handleShowHide(item.id, item.enabled)}
                                                     style={{ color: 'red', cursor: 'pointer' }}
                                                 >
                                                     <Icon path={mdiEyeOff} size={1.5} />

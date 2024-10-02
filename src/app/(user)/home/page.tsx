@@ -1,3 +1,5 @@
+'use client';
+
 import Icon from '@mdi/react';
 import {
     mdiArrowRight,
@@ -11,8 +13,28 @@ import {
 import Banner from './banner/banner';
 import Slide from './slide/slide';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import api from '~/utils/api';
 
 export default function Home() {
+    const [blogs, setBlogs] = useState([]);
+    const [newProducts, setNewProducts] = useState([]);
+    const [bestSellProducts, setBestSellProducts] = useState([]);
+
+    const render = async () => {
+        let result = await api.getRequest(`/blog/get-all?page=1&limit=3`);
+        setBlogs(result.data.listResult);
+        result = await api.getRequest(`/product/get-all-customer?page=1&limit=6`);
+        setNewProducts(result.data.listResult);
+        result = await api.getRequest(`/product/get-all-customer-orderby-soldquantity?page=1&limit=6`);
+        setBestSellProducts(result.data.listResult);
+        console.log(result.data);
+    };
+
+    useEffect(() => {
+        render();
+    }, []);
+
     return (
         <div>
             <Banner />
@@ -45,7 +67,7 @@ export default function Home() {
                 <div className="text-gray-500 text-sm mt-8">Bạn sẽ không thất vọng khi lựa chọn</div>
             </div>
             <div className="flex justify-start items-center mx-[80px] flex-wrap">
-                <Slide arr={[1, 2, 3, 4, 5, 6]}></Slide>
+                <Slide arr={bestSellProducts}></Slide>
             </div>
             <div className="my-20 text-center">
                 <span className="font-bold text-2xl pb-4" style={{ borderBottom: '1px solid #000' }}>
@@ -54,7 +76,7 @@ export default function Home() {
                 <div className="text-gray-500 text-sm mt-8">Bạn sẽ không thất vọng khi lựa chọn</div>
             </div>
             <div className="flex justify-start items-center mx-[80px] flex-wrap">
-                <Slide arr={[1, 2, 3, 4, 5, 6]}></Slide>
+                <Slide arr={newProducts}></Slide>
             </div>
             <div className="my-20 text-center">
                 <span className="font-bold text-2xl pb-4" style={{ borderBottom: '1px solid #000' }}>
@@ -63,81 +85,31 @@ export default function Home() {
                 <div className="text-gray-500 text-sm mt-8">Những bài blog về các sản phẩm mới nhất</div>
             </div>
             <div className="flex justify-center items-center flex-wrap">
-                <div className=" cursor-pointer group mx-5">
-                    <div className="w-[400px] h-[260px] overflow-hidden">
-                        <Image
-                            src={require('~/../public/images/1.jpeg')}
-                            alt=""
-                            width={10000}
-                            height={10000}
-                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
-                        />
-                    </div>
-                    <div className="flex justify-start items-center mt-3">
-                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
-                        <div className="mr-1 text-gray-800">
-                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                {blogs?.map((item: any) => (
+                    <div key={item.id} className=" cursor-pointer group mx-5">
+                        <div className="w-[400px] h-[260px] overflow-hidden">
+                            <Image
+                                src={item.thumbnail}
+                                alt=""
+                                width={10000}
+                                height={10000}
+                                className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
+                            />
                         </div>
-                        <div className="text-gray-800">1</div>
-                    </div>
-                    <div className="font-bold group-hover:primary-color">
-                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
-                    </div>
-                    <div className="text-xs mt-6 group-hover:primary-color">
-                        XEM THÊM
-                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
-                    </div>
-                </div>
-                <div className=" cursor-pointer group mx-5">
-                    <div className="w-[400px] h-[260px] overflow-hidden">
-                        <Image
-                            src={require('~/../public/images/1.jpeg')}
-                            alt=""
-                            width={10000}
-                            height={10000}
-                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
-                        />
-                    </div>
-                    <div className="flex justify-start items-center mt-3">
-                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
-                        <div className="mr-1 text-gray-800">
-                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                        <div className="flex justify-start items-center mt-3">
+                            <div className="mr-4 text-[15px] text-gray-500">{item.authorName}</div>
+                            <div className="mr-1 text-gray-800">
+                                <Icon path={mdiCommentTextOutline} size={0.7} />
+                            </div>
+                            <div className="text-gray-800">{item.comments.length}</div>
                         </div>
-                        <div className="text-gray-800">1</div>
-                    </div>
-                    <div className="font-bold group-hover:primary-color">
-                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
-                    </div>
-                    <div className="text-xs mt-6 group-hover:primary-color">
-                        XEM THÊM
-                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
-                    </div>
-                </div>
-                <div className=" cursor-pointer group mx-5">
-                    <div className="w-[400px] h-[260px] overflow-hidden">
-                        <Image
-                            src={require('~/../public/images/1.jpeg')}
-                            alt=""
-                            width={10000}
-                            height={10000}
-                            className="w-[400px] h-[260px] object-cover hover:scale-110 hover:transition-all hover:duration-200  hover:ease-linear transition-all duration-200  ease-linear"
-                        />
-                    </div>
-                    <div className="flex justify-start items-center mt-3">
-                        <div className="mr-4 text-[15px] text-gray-500">Saler - Thai Tran</div>
-                        <div className="mr-1 text-gray-800">
-                            <Icon path={mdiCommentTextOutline} size={0.7} />
+                        <div className="font-bold group-hover:primary-color">{item.title}</div>
+                        <div className="text-xs mt-6 group-hover:primary-color">
+                            XEM THÊM
+                            <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
                         </div>
-                        <div className="text-gray-800">1</div>
                     </div>
-                    <div className="font-bold group-hover:primary-color">
-                        Nón lá – Một biểu tượng đặc trưng của văn hóa Việt
-                    </div>
-                    <div className="text-xs mt-6 group-hover:primary-color">
-                        XEM THÊM
-                        <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );

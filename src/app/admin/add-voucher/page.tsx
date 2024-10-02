@@ -5,25 +5,43 @@ import styles from './add-voucher.module.scss';
 import Wrapper from '~/components/layouts/admin/wrapper';
 import Input from '~/components/input/input';
 import SaveButton from '~/components/save-button/save-button';
+import { useRouter } from 'next/navigation';
+import api from '~/utils/api';
+import { notify, notifyError } from '~/utils/notify';
+import SavingModal from '~/components/saving-modal';
 
 export default function AddVoucher() {
-    const [user, setUser] = useState({ name: '', code: '' });
+    const [voucher, setVoucher] = useState<any>();
+    const [savingModal, setSavingModal] = useState<boolean>(false);
+
+    const router = useRouter();
 
     const handleOnchange = (e: any) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        setVoucher({ ...voucher, [e.target.name]: e.target.value });
     };
 
-    const handleSave = async () => {};
+    const handleSave = async () => {
+        setSavingModal(true);
+        const result = await api.postRequest('/voucher/create', voucher);
+        setSavingModal(false);
+        if (result && result.statusCode === 200) {
+            notify('Lưu thành công');
+            router.push('/admin/voucher');
+        } else {
+            notifyError('Lưu không thành công');
+        }
+    };
 
     return (
         <div className={styles.wrapper}>
+            {savingModal && <SavingModal />}
             <Wrapper title="Quản lý voucher" detail="Thêm voucher">
-                <Input onChange={handleOnchange} name="email" label="Mã voucher" />
-                <Input onChange={handleOnchange} name="password" label="Phần trăm giảm" />
-                <Input onChange={handleOnchange} name="email" label="Giá giảm tối đa (VNĐ)" />
-                <Input onChange={handleOnchange} name="password" label="Số lượng" />
-                <Input onChange={handleOnchange} type="date" name="email" label="Thời gian bắt đầu" />
-                <Input onChange={handleOnchange} type="date" name="password" label="Thời gian kết thúc" />
+                <Input onChange={handleOnchange} name="name" label="Mã voucher" />
+                <Input onChange={handleOnchange} name="discountPercent" label="Phần trăm giảm" type="number" />
+                <Input onChange={handleOnchange} name="maxDiscount" label="Giá giảm tối đa (VNĐ)" type="number" />
+                <Input onChange={handleOnchange} name="quantity" label="Số lượng" type="number" />
+                <Input onChange={handleOnchange} type="date" name="startTime" label="Thời gian bắt đầu" />
+                <Input onChange={handleOnchange} type="date" name="endTime" label="Thời gian kết thúc" />
                 <SaveButton onClick={handleSave} />
             </Wrapper>
         </div>
