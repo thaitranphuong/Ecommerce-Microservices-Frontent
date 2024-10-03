@@ -6,6 +6,13 @@ function convertFromISODate(isoString: string) {
     return `${year}-${month}-${day}`;
 }
 
+function convertFromISODateExcludeYear(isoString: string) {
+    const date = new Date(isoString);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${day}/${month}`;
+}
+
 function convertFromISODateWithTime(isoString: string) {
     const date = new Date(isoString);
     const year = date.getFullYear();
@@ -26,4 +33,4 @@ function convertToISODate(dateString: string) {
     return date.toISOString();
 }
 
-export { convertFromISODate, convertFromISODateWithTime, convertToISODate };
+export { convertFromISODate, convertFromISODateWithTime, convertToISODate, convertFromISODateExcludeYear };

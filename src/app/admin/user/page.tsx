@@ -16,6 +16,7 @@ import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
 import { User as _User } from '~/data/data-type';
 import { convertFromISODate } from '~/utils/date-formatter';
+import ImageModal from '~/components/image-modal';
 
 function User() {
     const [users, setUsers] = useState<_User[]>([]);
@@ -87,6 +88,7 @@ function User() {
                     <thead>
                         <tr>
                             <th>STT</th>
+                            <th>Hình ảnh</th>
                             <th>Email</th>
                             <th>Họ và tên</th>
                             <th>Số điện thoại</th>
@@ -101,6 +103,12 @@ function User() {
                             users.map((item, index) => (
                                 <tr key={item.id}>
                                     <td>{index + 1 + (page - 1) * 5}</td>
+                                    <td>
+                                        <ImageModal
+                                            style={{ height: '50px', width: '50px', borderRadius: '50%' }}
+                                            imageUrl={item.avatar ? item.avatar : '/images/avatar.png'}
+                                        />
+                                    </td>
                                     <td>{item.email}</td>
                                     <td>{item.name}</td>
                                     <td>{item.phone}</td>

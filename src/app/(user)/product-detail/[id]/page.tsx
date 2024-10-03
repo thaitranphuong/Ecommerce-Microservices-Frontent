@@ -10,6 +10,7 @@ import productImage from '~/../public/images/nho-my.jpg';
 import star from '~/../public/images/start.png';
 import nonestar from '~/../public/images/none-start.png';
 import Head from '~/components/breadcumb';
+import { useState } from 'react';
 
 function ProductDetail() {
     const htmlContent = {

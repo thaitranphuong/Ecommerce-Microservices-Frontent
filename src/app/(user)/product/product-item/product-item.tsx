@@ -3,35 +3,32 @@ import styles from './product-item.module.scss';
 import Image from 'next/image';
 import clsx from 'clsx';
 
-function ProductItem({ product }: { product: any }) {
+function ProductItem({ product, key }: { product: any; key: any }) {
     return (
-        <Link href={`/product-detail/1`} key={1} className={styles.product_item}>
+        <Link href={`/product-detail/${product.id}`} key={key} className={styles.product_item}>
             <div className={styles.img_wrapper}>
                 <Image
                     className={clsx(styles.product_img, 'h-[300px] w-full object-cover')}
-                    src={require('~/../public/images/nho-my.jpg')}
+                    src={product.thumbnail}
                     alt=""
-                    width={10000}
-                    height={10000}
+                    width={1000}
+                    height={1000}
                 />
                 <div className={styles.modal_img}>
                     <div className={styles.modal_btn}>XEM THÊM</div>
                 </div>
-                <div className={styles.product_discount_label}>-{10}%</div>
+                <div className={styles.product_discount_label}>-{product.discountPercent}%</div>
             </div>
             <div className={styles.product_info}>
-                <div className={styles.product_name}>Áo thun nam HAFOS Raglan cổ tròn 5 màu, vải Cotton cao cấp</div>
+                <div className={styles.product_name}>{product.name}</div>
                 <div className={styles.product_price}>
                     <div className={styles.new_price}>
-                        {/* {Math.round(
-                            product.showedPrice - (product.showedPrice * product.percentDiscount) / 100,
-                        ).toLocaleString('vi-VN')} */}
-                        1.000 ₫
+                        {Math.round(product.price - (product.price * product.discountPercent) / 100).toLocaleString(
+                            'vi-VN',
+                        )}
+                        ₫
                     </div>
-                    <div className={styles.old_price}>
-                        {/* {Math.round(product.showedPrice).toLocaleString('vi-VN')} */}
-                        500₫
-                    </div>
+                    <div className={styles.old_price}>{Math.round(product.price).toLocaleString('vi-VN')}₫</div>
                 </div>
             </div>
         </Link>

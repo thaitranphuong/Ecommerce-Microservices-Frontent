@@ -1,12 +1,50 @@
+'use client';
+
 import { mdiMagnify } from '@mdi/js';
 import Icon from '@mdi/react';
 import clsx from 'clsx';
 
 import Head from '~/components/breadcumb';
 import ProductItem from './product-item/product-item';
-import Paginate from '~/components/pagination/pagination';
+import { useEffect, useState } from 'react';
+import api from '~/utils/api';
+import Pagination from '~/components/pagination/pagination';
 
 function ProductList() {
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [totalPage, setTotalpage] = useState(1);
+    const [page, setPage] = useState(1);
+    const [name, setName] = useState('');
+    const [category, setCategory] = useState(0);
+    const [price, setPrice] = useState(0);
+
+    const getProducts = async () => {
+        let result = await api.getRequest(
+            `/product/get-all-customer?page=${page}&limit=6&name=${name}&categoryId=${category}&price=${price}`,
+        );
+        setTotalpage(result.data.totalPage);
+        setPage(result.data.page);
+        setProducts(result.data.listResult);
+    };
+
+    const getCategories = async () => {
+        let result = await api.getRequest(`/product/get-all?page=1&limit=100`);
+        setCategories(result.data.listResult);
+    };
+
+    useEffect(() => {
+        getCategories();
+    }, []);
+
+    useEffect(() => {
+        getProducts();
+    }, [page, name, category, price]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [name, category, price]);
+
     return (
         <div>
             <Head
@@ -15,10 +53,11 @@ function ProductList() {
                 currentPage="Sản Phẩm"
                 link="/product"
             />
-            <div className="flex px-[100px] mt-[30px]">
+            <div className="flex px-[100px] mt-[100px]">
                 <div className="w-[308px] mr-4">
                     <div className="flex w-full border-solid border-green-800 border-[1px] rounded-sm">
                         <input
+                            onChange={(e: any) => setName(e.target.value)}
                             placeholder="Tìm kiếm sản phẩm theo tên"
                             className=" p-2 placeholder:text-gray-500 placeholder:text-sm flex-1"
                         />
@@ -30,12 +69,15 @@ function ProductList() {
                         <div className="font-sans font-semibold text-[18px]">Các danh mục</div>
                         <div className="w-full h-[2px] bg-[#00C300] my-2"></div>
                         <div>
-                            <div className="flex justify-start items-center mt-5 group cursor-pointer">
+                            <div
+                                onClick={() => setCategory(0)}
+                                className="flex justify-start items-center mt-5 group cursor-pointer"
+                            >
                                 <div
                                     className={clsx(
                                         'w-4 h-4 border-solid border-black border-[1px] rounded-full group-hover:bg-[#00C300]',
                                         {
-                                            ['bg-[#00C300]']: true,
+                                            ['bg-[#00C300]']: category === 0,
                                         },
                                     )}
                                 ></div>
@@ -43,69 +85,50 @@ function ProductList() {
                                     Tất cả
                                 </div>
                             </div>
-                            <div className="flex justify-start items-center mt-5 group cursor-pointer">
+                            {categories?.map((item: any) => (
                                 <div
-                                    className={clsx(
-                                        'w-4 h-4 border-solid border-black border-[1px] rounded-full group-hover:bg-[#00C300]',
-                                        {
-                                            ['bg-[#00C300]']: false,
-                                        },
-                                    )}
-                                ></div>
-                                <div className="ml-4 text-gray-500 font-semibold text-[15px] font-sans group-hover:text-[#00C300]">
-                                    Trái cây
+                                    onClick={() => setCategory(item.id)}
+                                    className="flex justify-start items-center mt-5 group cursor-pointer"
+                                >
+                                    <div
+                                        className={clsx(
+                                            'w-4 h-4 border-solid border-black border-[1px] rounded-full group-hover:bg-[#00C300]',
+                                            {
+                                                ['bg-[#00C300]']: category === item.id,
+                                            },
+                                        )}
+                                    ></div>
+                                    <div className="ml-4 text-gray-500 font-semibold text-[15px] font-sans group-hover:text-[#00C300]">
+                                        {item.name}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex justify-start items-center mt-5 group cursor-pointer">
-                                <div
-                                    className={clsx(
-                                        'w-4 h-4 border-solid border-black border-[1px] rounded-full group-hover:bg-[#00C300]',
-                                        {
-                                            ['bg-[#00C300]']: false,
-                                        },
-                                    )}
-                                ></div>
-                                <div className="ml-4 text-gray-500 font-semibold text-[15px] font-sans group-hover:text-[#00C300]">
-                                    Rau củ
-                                </div>
-                            </div>
-                            <div className="flex justify-start items-center mt-5 group cursor-pointer">
-                                <div
-                                    className={clsx(
-                                        'w-4 h-4 border-solid border-black border-[1px] rounded-full group-hover:bg-[#00C300]',
-                                        {
-                                            ['bg-[#00C300]']: false,
-                                        },
-                                    )}
-                                ></div>
-                                <div className="ml-4 text-gray-500 font-semibold text-[15px] font-sans group-hover:text-[#00C300]">
-                                    Hoa quả sấy khô
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                     <div className="flex justify-between items-center">
                         <div className="text-[14px] mr-1">0₫</div>
-
                         <div className="text-[14px] ml-1">1.000.000₫</div>
                     </div>
                     <input
                         id="default-range"
                         type="range"
-                        value="50"
+                        value={(price * 100) / 1000000}
+                        onChange={(e: any) => setPrice((e.target.value * 1000000) / 100)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                     />
+                    <div className="flex justify-between items-center">
+                        <div className="text-[14px] mr-1 text-yellow-500">
+                            {'Giá => ' + price.toLocaleString('vi-VN')}₫
+                        </div>
+                    </div>
                 </div>
                 <div className="flex-1 h-[1000px]">
                     <div className="flex justify-start items-center flex-wrap">
-                        <ProductItem product={{}} />
-                        <ProductItem product={{}} />
-                        <ProductItem product={{}} />
-                        <ProductItem product={{}} />
-                        <ProductItem product={{}} />
-                        <ProductItem product={{}} />
+                        {products?.map((item: any) => (
+                            <ProductItem key={item.id} product={item} />
+                        ))}
                     </div>
-                    <Paginate page={1} setPage={1} totalPage={10} />
+                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
                 </div>
             </div>
         </div>

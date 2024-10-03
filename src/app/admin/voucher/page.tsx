@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import Excel from '~/components/excel/excel';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
-import { convertFromISODate, convertFromISODateWithTime } from '~/utils/date-formatter';
+import { convertFromISODate } from '~/utils/date-formatter';
 
 function Voucher() {
     const [vouchers, setVouchers] = useState([]);
