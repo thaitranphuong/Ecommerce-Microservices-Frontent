@@ -1,27 +1,66 @@
 'use client';
 
 import Icon from '@mdi/react';
-import { mdiPen, mdiTrashCan } from '@mdi/js';
+import { mdiDeveloperBoard, mdiPen, mdiTrashCan } from '@mdi/js';
 
 import Wrapper from '~/components/layouts/admin/wrapper';
 import ExcelButton from '~/components/excel-button/excel-button';
 import Pagination from '~/components/pagination/pagination';
-import SearchBar from '~/components/search-bar/search-bar';
 import AddButton from '~/components/add-button/add-button';
 import styles from './import.module.scss';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Excel from '~/components/excel/excel';
+import api from '~/utils/api';
+import { convertFromISODateWithTime, convertToISODate, getCurrentDate } from '~/utils/date-formatter';
+import Input from '~/components/input/input';
 
 function Import() {
+    const [imports, setImports] = useState([]);
+    const [totalPage, setTotalpage] = useState(1);
+    const [page, setPage] = useState(1);
+    const [startTime, setStartTime] = useState('2024-01-01');
+    const [endTime, setEndTime] = useState(getCurrentDate());
+
+    const render = async () => {
+        let result = await api.getRequest(
+            `/import/get-all?page=${page}&limit=6&startTime=${convertToISODate(startTime)}&endTime=${convertToISODate(
+                endTime,
+            )}`,
+        );
+        setTotalpage(result.data.totalPage);
+        setPage(result.data.page);
+        setImports(result.data.listResult);
+        console.log(convertToISODate(endTime));
+    };
+
+    useEffect(() => {
+        render();
+    }, [page, startTime, endTime]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [startTime, endTime]);
     return (
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý nhập hàng" detail="Danh sách phiếu nhập">
                 <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <SearchBar onChange={{}} value={''} placeholder="Tìm kiếm theo mã phiếu nhập" />
+                    <div className="flex items-center">
+                        <Input
+                            value={startTime}
+                            label="Ngày bắt đầu"
+                            onChange={(e: any) => setStartTime(e.target.value)}
+                            type="date"
+                        />
+                        <Input
+                            value={endTime}
+                            label="Ngày kết thúc"
+                            onChange={(e: any) => setEndTime(e.target.value)}
+                            type="date"
+                        />
+                    </div>
                     <div>
                         <AddButton to="/admin/add-import" />
-                        <ExcelButton onClick={{}} />
+                        {/* <ExcelButton onClick={{}} /> */}
                     </div>
                 </div>
                 <table
@@ -38,30 +77,30 @@ function Import() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr key={1}>
-                            <td>1</td>
-                            <td>a</td>
-                            <td>a</td>
-                            <td>a</td>
-                            <td>a</td>
-                            <td>
-                                <div className="flex justify-center items-center">
-                                    <Link
-                                        href={`/admin/edit-import/1`}
-                                        style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
-                                    >
-                                        <Icon path={mdiPen} size={1.5} />
-                                    </Link>
-                                    <span style={{ color: 'red', cursor: 'pointer' }}>
-                                        <Icon path={mdiTrashCan} size={1.5} />
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
+                        {imports?.map((item: any, index: any) => (
+                            <tr key={item.id}>
+                                <td>{item.id}</td>
+                                <td>{convertFromISODateWithTime(item.createdTime)}</td>
+                                <td>{item.userName}</td>
+                                <td>{item.supplierName}</td>
+                                <td>{item.warehouseName}</td>
+                                <td>
+                                    <div className="flex justify-center items-center">
+                                        <Link
+                                            title="Xem chi tiết"
+                                            href={`/admin/edit-import/${item.id}`}
+                                            style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
+                                        >
+                                            <Icon path={mdiDeveloperBoard} size={2} />
+                                        </Link>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
                 <div style={{ width: '100%' }}>
-                    <Pagination page={1} setPage={{}} totalPage={4} />
+                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
                 </div>
             </Wrapper>
         </div>

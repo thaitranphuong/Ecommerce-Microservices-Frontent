@@ -22,7 +22,7 @@ function Select({
                 <option key="" value={''}>
                     --Chọn {label}--
                 </option>
-                {array.map((item: any) => (
+                {array?.map((item: any) => (
                     <option key={item.id} value={item.id}>
                         {item.name}
                     </option>

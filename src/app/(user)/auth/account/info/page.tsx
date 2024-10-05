@@ -56,15 +56,14 @@ export default function Info() {
         }
         user.gender == 'false' ? (user.gender = false) : (user.gender = true);
         user.birthDay = convertToISODate(user.birthDay);
-        console.log(user);
         result = await api.putRequest('/user/update', user);
         if (result && result.statusCode === 200 && result.id !== null) {
+            result = await api.getRequest('/user/get/' + user.id);
+            if (result && result.statusCode === 200) setUser(result.data);
             notify('Cập nhật tài khoản thành công');
         } else {
             notifyError('Cập nhật tài khoản thất bại');
         }
-        result = await api.getRequest('/user/get/' + user.id);
-        if (result && result.statusCode === 200) setUser(result.data);
         setSavingModal(false);
     };
     return (

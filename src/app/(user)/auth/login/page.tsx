@@ -133,6 +133,7 @@ function Login() {
             localStorage.setItem('user', JSON.stringify(result.data.user));
             localStorage.setItem('token', JSON.stringify(result.data.token));
             if (result.data.user.roles.includes('admin')) router.push('/admin');
+            else router.push('/home');
         } else {
             notifyError('Sai email hoặc mật khẩu');
         }

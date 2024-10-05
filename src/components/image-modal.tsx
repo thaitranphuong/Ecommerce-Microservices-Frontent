@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import Modal from 'react-modal';
 
-const ImageModal = ({ imageUrl, style }: { imageUrl: any; style: any }) => {
+const ImageModal = ({ imageUrl, style }: { imageUrl: any; style?: any }) => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const openModal = () => {

@@ -28,9 +28,23 @@ function convertToISODate(dateString: string) {
     // Chuyển chuỗi 'yyyy-MM-dd' thành đối tượng Date
     const date = new Date(dateString);
     // Đặt giờ, phút, giây mặc định là 00:00:00.000
-    date.setUTCHours(0, 0, 0, 0);
+    date.setUTCHours(23, 59, 59, 0);
     // Chuyển đổi sang định dạng ISO với múi giờ UTC
     return date.toISOString();
 }
 
-export { convertFromISODate, convertFromISODateWithTime, convertToISODate, convertFromISODateExcludeYear };
+function getCurrentDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // getMonth() is zero-based
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+export {
+    convertFromISODate,
+    convertFromISODateWithTime,
+    convertToISODate,
+    convertFromISODateExcludeYear,
+    getCurrentDate,
+};
