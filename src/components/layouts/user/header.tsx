@@ -12,15 +12,18 @@ import Icon from '@mdi/react';
 import { mdiCartVariant, mdiMessageText } from '@mdi/js';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { getUser } from '~/utils/localstorage';
 const HeaderLoginLink = dynamic(() => import('~/components/layouts/user/header-login-link'), { ssr: false });
 
 function Header() {
     const [active, setActive] = useState(1);
     const [fixed, setFixed] = useState(false);
     const pathname = usePathname();
+    const [user, setUser] = useState<any>({ avatar: null });
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
+        setUser(getUser());
     }, []);
 
     useEffect(() => {
@@ -128,9 +131,17 @@ function Header() {
                             1
                         </div>
                     </Link>
-                    <Link href="/auth/account/info" className="ml-2 mb-px">
-                        <Image src={avatar} alt="" className="w-[25px] h-[25px] object-cover rounded-full"></Image>
-                    </Link>
+                    {user && (
+                        <Link href="/auth/account/info" className="ml-2 mb-px">
+                            <Image
+                                src={!!user.avatar ? user.avatar : avatar}
+                                alt=""
+                                className="w-[25px] h-[25px] object-cover rounded-full"
+                                width={1000}
+                                height={1000}
+                            ></Image>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

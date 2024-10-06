@@ -23,7 +23,7 @@ function HeaderLoginLink() {
                 </>
             ) : (
                 <>
-                    <Link href={'/auth/acount/info'} className="mr-8">
+                    <Link href={'/auth/account/info'} className="mr-8">
                         {getUser()?.name}
                     </Link>
                     <div

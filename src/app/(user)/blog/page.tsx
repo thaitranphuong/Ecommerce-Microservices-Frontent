@@ -55,7 +55,7 @@ export default function Blog() {
                     {blogs?.map((item: any) => (
                         <Link
                             key={item.id}
-                            href={'/blog-detail/1'}
+                            href={`/blog-detail/${item.slug}`}
                             className="min-h-[1px] relative mb-10 block"
                             style={{ boxShadow: '0px 10px 10px #e7e7e7' }}
                         >
@@ -83,7 +83,7 @@ export default function Blog() {
                                 <div className="text-gray-600 text-[18px]">{item.shortDescription}</div>
                                 <div className="mt-[40px] text-gray-500">
                                     <Icon path={mdiCommentTextOutline} size={0.7} className="inline mb-px" />
-                                    {item.comments.Length} Bình luận |&nbsp;
+                                    {item.commentCount} Bình luận |&nbsp;
                                     <Icon path={mdiAccountOutline} size={0.7} className="inline mb-[4px]" />
                                     {item.authorName}
                                 </div>
@@ -116,7 +116,7 @@ export default function Blog() {
                             {proposedBlogs?.map((item: any) => (
                                 <Link
                                     key={item.id}
-                                    href={`/blog-detail/${item.id}`}
+                                    href={`/blog-detail/${item.slug}`}
                                     className="flex justify-start items-center group cursor-pointer"
                                 >
                                     <Image
