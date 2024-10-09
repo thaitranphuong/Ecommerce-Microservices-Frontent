@@ -30,7 +30,6 @@ function Import() {
         setTotalpage(result.data.totalPage);
         setPage(result.data.page);
         setImports(result.data.listResult);
-        console.log(convertToISODate(endTime));
     };
 
     useEffect(() => {

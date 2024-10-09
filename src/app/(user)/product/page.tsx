@@ -29,7 +29,7 @@ function ProductList() {
     };
 
     const getCategories = async () => {
-        let result = await api.getRequest(`/product/get-all?page=1&limit=100`);
+        let result = await api.getRequest(`/category/get-all?page=1&limit=100`);
         setCategories(result.data.listResult);
     };
 
@@ -107,13 +107,13 @@ function ProductList() {
                     </div>
                     <div className="flex justify-between items-center">
                         <div className="text-[14px] mr-1">0₫</div>
-                        <div className="text-[14px] ml-1">1.000.000₫</div>
+                        <div className="text-[14px] ml-1">200.000₫</div>
                     </div>
                     <input
                         id="default-range"
                         type="range"
-                        value={(price * 100) / 1000000}
-                        onChange={(e: any) => setPrice((e.target.value * 1000000) / 100)}
+                        value={(price * 100) / 200000}
+                        onChange={(e: any) => setPrice((e.target.value * 200000) / 100)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                     />
                     <div className="flex justify-between items-center">

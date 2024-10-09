@@ -119,14 +119,16 @@ export default function Blog() {
                                     href={`/blog-detail/${item.slug}`}
                                     className="flex justify-start items-center group cursor-pointer"
                                 >
-                                    <Image
-                                        src={item.thumbnail}
-                                        alt=""
-                                        width={1000}
-                                        height={1000}
-                                        className="w-[100px] h-[80px] object-cover rounded-md mb-2"
-                                    />
-                                    <div className="ml-5">
+                                    <div className="w-[100px] h-[80px] mb-2 rounded-md">
+                                        <Image
+                                            src={item.thumbnail}
+                                            alt=""
+                                            width={1000}
+                                            height={1000}
+                                            className="w-full h-full object-cover rounded-md "
+                                        />
+                                    </div>
+                                    <div className="ml-5 flex-1">
                                         <div className="font-semibold text-sm mb-2 group-hover:text-[#00C300]">
                                             {item.title}
                                         </div>

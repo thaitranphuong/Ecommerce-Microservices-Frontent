@@ -100,7 +100,9 @@ function Product() {
                                     <td>{item.categoryName}</td>
                                     <td>{item.quantity}</td>
                                     <td>{item.soldQuantity}</td>
-                                    <td>{item.price.toLocaleString('vi-VN')} ₫</td>
+                                    <td>
+                                        {item.price.toLocaleString('vi-VN')} ₫/{item.unit}
+                                    </td>
                                     <td>
                                         <div className="flex justify-center items-center">
                                             <Link

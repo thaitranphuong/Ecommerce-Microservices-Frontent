@@ -93,8 +93,8 @@ function Voucher() {
                                 <tr>
                                     <td>{index + 1 + (page - 1) * 5}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.discountPercent}</td>
-                                    <td>{item.maxDiscount}</td>
+                                    <td>{item.discountPercent}%</td>
+                                    <td>{item.maxDiscount.toLocaleString('vi-VN')} đ</td>
                                     <td>{item.quantity}</td>
                                     <td>{item.quantity - item.usedQuantity}</td>
                                     <td>{convertFromISODate(item.startTime)}</td>

@@ -27,6 +27,7 @@ export default function AddImport() {
         name: '',
     });
     const [importDetails, setImportDetails] = useState<any>([]);
+    const [unit, setUnit] = useState<string>('');
 
     const router = useRouter();
 
@@ -56,8 +57,10 @@ export default function AddImport() {
     };
 
     const handleChooseProduct = (e: any) => {
-        const name = products.find((item: any) => item.id == e.target.value)?.name;
+        const product = products.find((item: any) => item.id == e.target.value);
+        const name = product?.name;
         setImportDetail({ ...importDetail, [e.target.name]: e.target.value, name });
+        setUnit(product?.unit);
     };
 
     const handleOnchangeDetail = (e: any) => {
@@ -77,14 +80,17 @@ export default function AddImport() {
             notifyError('Chưa nhập đơn giá');
             return;
         }
+        importDetail.unit = unit;
         importDetails.push(importDetail);
         setImportDetails([...importDetails]);
         setImportDetail({
             quantity: '',
             price: '',
             productId: '',
+            unit: '',
             name: '',
         });
+        setUnit('');
     };
 
     const handleRemoveDetail = (index: any) => {
@@ -130,13 +136,14 @@ export default function AddImport() {
                     array={products}
                 />
                 <Input
-                    width="25%"
+                    width="20%"
                     onChange={handleOnchangeDetail}
                     value={importDetail?.quantity}
                     name="quantity"
                     label="Số lượng (Khối lượng)"
                     type="number"
                 />
+                <Input width="5%" value={unit} label="Đơn vị" disabled={true} />
                 <Input
                     width="25%"
                     onChange={handleOnchangeDetail}
@@ -166,8 +173,12 @@ export default function AddImport() {
                             <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
-                                <td>{item.quantity}</td>
-                                <td>{item.price.toLocaleString('vn-VN')} ₫</td>
+                                <td>
+                                    {item.quantity} {item.unit}
+                                </td>
+                                <td>
+                                    {item.price.toLocaleString('vn-VN')} ₫/<sub>{item.unit}</sub>
+                                </td>
                                 <td>
                                     <div className="flex justify-center" onClick={() => handleRemoveDetail(index)}>
                                         <Icon

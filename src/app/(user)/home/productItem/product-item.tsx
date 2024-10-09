@@ -26,9 +26,11 @@ function ProductItem({ product }: { product?: any }) {
                         {Math.round(product?.price - (product?.price * product?.discountPercent) / 100).toLocaleString(
                             'vi-VN',
                         )}
-                        ₫
+                        &nbsp;₫/<sub>{product?.unit}</sub>
                     </div>
-                    <div className={styles.old_price}>{Math.round(product?.price).toLocaleString('vi-VN')} ₫</div>
+                    <div className={styles.old_price}>
+                        {Math.round(product?.price).toLocaleString('vi-VN')} ₫/<sub>{product?.unit}</sub>
+                    </div>
                 </div>
             </div>
         </Link>

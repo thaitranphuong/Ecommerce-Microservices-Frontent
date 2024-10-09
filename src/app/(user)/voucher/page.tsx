@@ -43,13 +43,16 @@ export default function Voucher() {
                             <div className="text-white text-xl font-semibold mt-2">{item.name}</div>
                         </div>
                         <div className="flex-1 p-6 ">
-                            <div className="text-[40px] mt-2">Giảm ₫{item.discountPercent.toLocaleString('vi-VN')}</div>
+                            <div className="text-[40px] mt-2">Giảm {item.discountPercent.toLocaleString('vi-VN')}%</div>
                             <div className="text-[20px] mt-2 text-gray-600">
                                 Giảm tối đa ₫{item.maxDiscount.toLocaleString('vi-VN')}
                             </div>
                             <div className="flex justify-start items-center">
                                 <div className="w-[145px] h-[15px] bg-slate-300 rounded-xl">
-                                    <div className="w-[70%] h-[15px] bg-[#00c300] rounded-xl"></div>
+                                    <div
+                                        className="h-[15px] bg-[#00c300] rounded-xl"
+                                        style={{ width: `${Math.ceil((item.usedQuantity / item.quantity) * 100)}%` }}
+                                    ></div>
                                 </div>
                                 <div className="ml-3 text-xl text-[#1f931f]">
                                     Đã dùng {Math.ceil((item.usedQuantity / item.quantity) * 100)}%

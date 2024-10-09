@@ -163,18 +163,18 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                     name="categoryId"
                 />
                 <Input value={product?.origin} onChange={handleOnchange} label="Xuất xứ" name="origin" />
+                <Input value={product?.price} onChange={handleOnchange} label="Giá (VNĐ)" width="25%" name="price" />
                 <Input
-                    value={product?.price}
+                    value={product?.unit}
                     onChange={handleOnchange}
-                    label="Giá (VNĐ)"
-                    width="33%"
-                    name="price"
-                    type={'number'}
+                    label="Đơn vị tính (kg, gam,...)"
+                    width="25%"
+                    name="unit"
                 />
                 <Input
                     onChange={handleOnchange}
                     label="Giảm giá (%)"
-                    width="33%"
+                    width="25%"
                     type="number"
                     name="discountPercent"
                     value={product?.discountPercent}
@@ -182,7 +182,7 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                 <Input
                     onChange={handleOnchange}
                     label="Hạn sử dụng (ngày)"
-                    width="33%"
+                    width="25%"
                     name="expiry"
                     value={product?.expiry}
                     type={'number'}

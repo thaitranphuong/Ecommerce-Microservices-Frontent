@@ -117,15 +117,16 @@ export default function AddProduct() {
                 </div>
                 <Select onChange={handleOnchange} label="Danh mục" array={categories} name="categoryId" />
                 <Input onChange={handleOnchange} label="Xuất xứ" name="origin" />
-                <Input onChange={handleOnchange} label="Giá (VNĐ)" width="33%" name="price" type={'number'} />
+                <Input onChange={handleOnchange} label="Giá (VNĐ)" width="25%" name="price" type={'number'} />
+                <Input onChange={handleOnchange} label="Đơn vị tính (kg, gam,...)" width="25%" name="unit" />
                 <Input
                     onChange={handleOnchange}
                     label="Giảm giá (%)"
-                    width="33%"
+                    width="25%"
                     type="number"
                     name="discountPercent"
                 />
-                <Input onChange={handleOnchange} label="Hạn sử dụng (ngày)" width="33%" name="expiry" type={'number'} />
+                <Input onChange={handleOnchange} label="Hạn sử dụng (ngày)" width="25%" name="expiry" type={'number'} />
                 <TextArea onChange={handleOnchange} label="Mô tả ngắn" name="shortDescription" />
                 <Editor
                     onChange={handleOnchange}

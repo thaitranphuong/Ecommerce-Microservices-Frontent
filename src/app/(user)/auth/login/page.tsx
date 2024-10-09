@@ -1,6 +1,6 @@
 'use client';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import styles from './login.module.scss';
 import Image from 'next/image';
@@ -9,6 +9,8 @@ import User from '~/app/admin/user/page';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
 import { useRouter } from 'next/navigation';
+import SavingModal from '~/components/saving-modal';
+import { getUser } from '~/utils/localstorage';
 
 type User = {
     name: string;
@@ -32,7 +34,14 @@ function Login() {
         phone: '',
         password: '',
     });
+    const [processing, setProcessing] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (!!getUser()) {
+            router.push('/home');
+        }
+    }, []);
 
     const handleInputLoginChange = (e: any) => {
         setUserLogin({ ...userLogin, [e.target.name]: e.target.value });
@@ -102,6 +111,7 @@ function Login() {
     const handleCheck = (e: any) => check(e.target);
 
     const handleRegister = async () => {
+        setProcessing(true);
         const elementArray = [];
         const nameElement = document.getElementsByName('name')[0];
         const emailElement = document.getElementsByName('email')[0];
@@ -124,9 +134,11 @@ function Login() {
                 notifyError('Đăng ký thất bại');
             }
         }
+        setProcessing(false);
     };
 
     const handleLogin = async () => {
+        setProcessing(true);
         localStorage.clear();
         const result = await api.postRequest('/auth/login', userLogin);
         if (result && result.statusCode === 200) {
@@ -137,10 +149,12 @@ function Login() {
         } else {
             notifyError('Sai email hoặc mật khẩu');
         }
+        setProcessing(false);
     };
 
     return (
         <>
+            {processing && <SavingModal text="Đang xử lý " />}
             <div className={styles.wrapper}>
                 <div className={styles.full}>
                     <div className={styles.main}>
@@ -205,13 +219,7 @@ function Login() {
                                     height={100}
                                     src={require('~/../public/images/google_logo.png')}
                                 />
-                                <Image
-                                    className={styles.auth0_btn}
-                                    alt=""
-                                    width={100}
-                                    height={100}
-                                    src={require('~/../public/images/facebook_logo.png')}
-                                />
+                                Đăng nhập với Google
                             </div>
                             <input
                                 onChange={handleInputLoginChange}

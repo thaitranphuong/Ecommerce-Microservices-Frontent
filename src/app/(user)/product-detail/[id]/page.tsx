@@ -96,6 +96,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     }, [page]);
 
     const handleLike = async (commentId: number) => {
+        if (!getUser()) return;
         await api.getRequest(`/comment/like/${commentId}/${getUser().id}` + '');
         getComments();
     };
@@ -164,6 +165,16 @@ function ProductDetail({ params }: { params: { id: string } }) {
             console.log(comment);
         }
         setSavingModal(false);
+    };
+
+    const handleDeleteComment = async (id: number) => {
+        const result = await api.deleteRequest('/comment/delete/' + id);
+        if (result?.statusCode === 200) {
+            getComments();
+            notify('Xóa bình luận thành công');
+        } else {
+            notifyError('Xóa bình luận thất bại');
+        }
     };
 
     return (
@@ -257,13 +268,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                         <div className={styles.product_right_price}>
                             <div className={styles.product_right_price_new}>
-                                ₫
                                 {Math.round((product?.price * (100 - product?.discountPercent)) / 100).toLocaleString(
                                     'vi-VN',
                                 )}
+                                &nbsp;₫/<sub>{product?.unit}</sub>
                             </div>
                             <div className={styles.product_right_price_old}>
-                                ₫{Math.round(product?.price).toLocaleString('vi-VN')}
+                                {Math.round(product?.price).toLocaleString('vi-VN')}&nbsp;₫/<sub>{product?.unit}</sub>
                             </div>
                             <div className={styles.product_right_price_discount}>{product?.discountPercent}% GIẢM</div>
                         </div>
@@ -585,7 +596,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                     </div>
                                 </div>
                                 {getUser().isAdmin && (
-                                    <button className="ml-[-40px] bg-red-600 text-white h-[30px] w-[40px] hover:bg-red-800 rounded-md">
+                                    <button
+                                        onClick={() => handleDeleteComment(item.id)}
+                                        className="ml-[-40px] bg-red-600 text-white h-[30px] w-[40px] hover:bg-red-800 rounded-md"
+                                    >
                                         Xóa
                                     </button>
                                 )}

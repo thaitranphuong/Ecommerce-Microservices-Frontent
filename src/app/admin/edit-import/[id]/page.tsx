@@ -41,7 +41,7 @@ function EditImport({ params }: { params: { id: string } }) {
                         <tr>
                             <th>STT</th>
                             <th>Sản phẩm</th>
-                            <th>Số lượng</th>
+                            <th>Số lượng (Khối lượng)</th>
                             <th>Đơn giá</th>
                         </tr>
                     </thead>
@@ -57,17 +57,23 @@ function EditImport({ params }: { params: { id: string } }) {
                                         {item.productName}
                                     </div>
                                 </td>
-                                <td>{item.quantity}</td>
-                                <td>{item.price.toLocaleString('vi-VN')} ₫</td>
+                                <td>
+                                    {item.quantity}
+                                    &nbsp;{item.unit}
+                                </td>
+                                <td>
+                                    {item.price.toLocaleString('vi-VN')} ₫/<sub>{item.unit}</sub>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
                 <strong className="text-green-700 ml-2">
                     Tổng tiền:{' '}
-                    {_import?.importDetails
-                        .reduce((acc: any, item: any) => (acc += +item.price * +item.quantity), 0)
-                        .toLocaleString('vn-VN')}{' '}
+                    {_import?.importDetails &&
+                        _import.importDetails
+                            .reduce((acc: any, item: any) => (acc += +item.price * +item.quantity), 0)
+                            .toLocaleString('vn-VN')}{' '}
                     ₫
                 </strong>
             </Wrapper>

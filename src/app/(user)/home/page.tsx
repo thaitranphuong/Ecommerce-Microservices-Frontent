@@ -15,6 +15,7 @@ import Slide from './slide/slide';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import api from '~/utils/api';
+import Link from 'next/link';
 
 export default function Home() {
     const [blogs, setBlogs] = useState([]);
@@ -86,7 +87,7 @@ export default function Home() {
             </div>
             <div className="flex justify-center items-center flex-wrap">
                 {blogs?.map((item: any) => (
-                    <div key={item.id} className=" cursor-pointer group mx-5">
+                    <Link href={'/blog-detail/' + item.slug} key={item.id} className=" cursor-pointer group mx-5">
                         <div className="w-[400px] h-[260px] overflow-hidden">
                             <Image
                                 src={item.thumbnail}
@@ -101,14 +102,14 @@ export default function Home() {
                             <div className="mr-1 text-gray-800">
                                 <Icon path={mdiCommentTextOutline} size={0.7} />
                             </div>
-                            <div className="text-gray-800">{item.comments.length}</div>
+                            <div className="text-gray-800">{item.commentCount}</div>
                         </div>
                         <div className="font-bold group-hover:primary-color">{item.title}</div>
                         <div className="text-xs mt-6 group-hover:primary-color">
                             XEM THÊM
                             <Icon path={mdiArrowRight} size={0.7} className="inline-block mb-1" />
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </div>
