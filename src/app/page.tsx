@@ -8,5 +8,5 @@ export default function MyApp() {
     useEffect(() => {
         router.push('/home');
     });
-    return;
+    return <div className="w-full h-[500px] flex justify-center items-center text-2xl">Loading...</div>;
 }

@@ -4,17 +4,17 @@ import clsx from 'clsx';
 import Icon from '@mdi/react';
 import { mdiSend } from '@mdi/js';
 import { useEffect, useRef, useState } from 'react';
-import { over } from 'stompjs';
-import SockJS from 'sockjs-client';
 import Image from 'next/image';
+import * as signalR from '@microsoft/signalr';
 
 import styles from './message.module.scss';
 import { getToken, getUser } from '~/utils/localstorage';
 import { config } from '~/utils/config';
+import { convertFromISODateWithTime } from '~/utils/date-formatter';
 
-var stompClient: any = null;
-var connected = false;
-var subscribed = false;
+let connection: any = null;
+let connected = false;
+let subscribed = false;
 function Message() {
     const ref: any = useRef();
     const [privateChats, setPrivateChats] = useState<any>(new Map());
@@ -35,14 +35,36 @@ function Message() {
     }, [privateChats, tab]);
 
     useEffect(() => {
-        connect();
-        // onConnected();
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl('wss://localhost:5003/ws', {
+                skipNegotiation: true,
+                transport: signalR.HttpTransportType.WebSockets,
+            })
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on('ReceivePrivateMessage/' + getUser().id, (payload: any) => {
+            pushPrivateMessage(payload);
+        });
+
+        connection
+            .start()
+            .then(() => onConnected())
+            .catch(onError);
+
+        subscribed = true;
+
+        return () => {
+            if (connection) {
+                connection.stop();
+            }
+        };
     }, []);
 
-    const connect = () => {
-        let Sock = new SockJS('https://localhost:5003' + '/ws');
-        stompClient = over(Sock);
-        stompClient.connect({}, onConnected, onError);
+    const pushPrivateMessage = (payload: any) => {
+        console.log(payload);
+        privateChats.get(payload.senderId).push(payload);
+        setPrivateChats(new Map(privateChats));
     };
 
     const onConnected = async () => {
@@ -87,13 +109,6 @@ function Message() {
                                     privateChats.get(receiverId).push(chatMessage);
                                 });
                                 setPrivateChats(new Map(privateChats));
-                                if (!subscribed) {
-                                    stompClient.subscribe(
-                                        '/user-chat/' + userData.userId + '/private',
-                                        onPrivateMessage,
-                                    );
-                                    subscribed = true;
-                                }
                             });
                     });
                 });
@@ -101,13 +116,7 @@ function Message() {
     };
 
     const onError = (err: any) => {
-        console.log(err);
-    };
-
-    const onPrivateMessage = (payload: any) => {
-        var payloadData = JSON.parse(payload.body);
-        privateChats.get(payloadData.senderId).push(payloadData);
-        setPrivateChats(new Map(privateChats));
+        console.log('Error connecting to SignalR:', err);
     };
 
     const handleMessage = (e: any) => {
@@ -117,7 +126,7 @@ function Message() {
 
     const sendPrivateValue = () => {
         if (userData.message)
-            if (stompClient) {
+            if (connection) {
                 var currentTime = new Date();
                 var day = currentTime.getDate();
                 var month = currentTime.getMonth() + 1;
@@ -142,8 +151,12 @@ function Message() {
                     setPrivateChats(new Map(privateChats));
                     chatMessage.createdTime = new Date();
                 }
-                stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
-                setUserData({ ...userData, message: '' });
+                connection
+                    .invoke('SendPrivateMessage', tab, chatMessage)
+                    .then(() => {
+                        setUserData({ ...userData, message: '' });
+                    })
+                    .catch(onError);
             }
     };
 
@@ -164,14 +177,10 @@ function Message() {
                                 <div className={styles.avatar_container}>
                                     <Image
                                         className={styles.avatar_image}
-                                        src={
-                                            item.avatar
-                                                ? config.baseURL + '/getimage/users/' + item.avatar
-                                                : require('~/../public/images/avatar.png')
-                                        }
+                                        src={!!item.avatar ? item.avatar : require('~/../public/images/avatar.png')}
                                         alt="Avatar"
-                                        width={1000}
-                                        height={1000}
+                                        width={200}
+                                        height={200}
                                     />
                                 </div>
                                 <div className={styles.info}>
@@ -179,8 +188,10 @@ function Message() {
                                         <div className={styles.info_name}>{item.name}</div>
                                         <div className={styles.info_time}>
                                             {privateChats.get(item.id).length > 0 &&
-                                                privateChats.get(item.id)[privateChats.get(item.id).length - 1]
-                                                    .createdTime}
+                                                convertFromISODateWithTime(
+                                                    privateChats.get(item.id)[privateChats.get(item.id).length - 1]
+                                                        .createdTime,
+                                                )}
                                         </div>
                                     </div>
                                     <div className={styles.info_bottom}>
@@ -200,37 +211,37 @@ function Message() {
                         {!!privateChats.get(tab) &&
                             privateChats.get(tab).map((item: any, index: any) => (
                                 <div
+                                    key={index}
                                     className={clsx(styles.message_item, {
                                         [styles.message_item_seft]: userData.userId === item.senderId,
                                     })}
                                 >
                                     <Image
                                         className={styles.message_avatar}
-                                        src={
-                                            item.avatar
-                                                ? config.baseURL + '/getimage/users/' + item.avatar
-                                                : require('~/../public/images/avatar.png')
-                                        }
+                                        src={!!item.avatar ? item.avatar : require('~/../public/images/avatar.png')}
                                         alt="Avatar"
-                                        width={1000}
-                                        height={1000}
+                                        width={200}
+                                        height={200}
                                     />
                                     <div className={styles.message_block}>
                                         <div className={styles.message_name}>{item.senderName}</div>
                                         <div className={styles.message_content}>{item.content}</div>
-                                        <div className={styles.message_time}>{item.createdTime}</div>
+                                        <div className={styles.message_time}>
+                                            {convertFromISODateWithTime(item.createdTime)}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                     </div>
                     <div className={styles.message_bar}>
                         <input
+                            disabled={tab === 1}
                             onChange={handleMessage}
                             className={styles.message_input}
                             placeholder="Nhập tin nhắn đến admin"
                             value={userData.message}
                         />
-                        <button onClick={sendPrivateValue} className={styles.message_send_btn}>
+                        <button onClick={tab === 1 ? () => '' : sendPrivateValue} className={styles.message_send_btn}>
                             <Icon path={mdiSend} size={2.5} />
                         </button>
                     </div>
