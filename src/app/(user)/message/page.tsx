@@ -11,6 +11,8 @@ import styles from './message.module.scss';
 import { getToken, getUser } from '~/utils/localstorage';
 import { config } from '~/utils/config';
 import { convertFromISODateWithTime } from '~/utils/date-formatter';
+import api from '~/utils/api';
+import ImageModal from '~/components/image-modal';
 
 let connection: any = null;
 let connected = false;
@@ -29,6 +31,8 @@ function Message() {
         avatar: getUser().avatar,
         roles: getUser().roles,
     });
+    const [image, setImage] = useState<any>();
+    const [isUploadImage, setIsUploadImage] = useState<boolean>(false);
 
     useEffect(() => {
         ref.current.scrollTop = ref.current.scrollHeight;
@@ -124,7 +128,12 @@ function Message() {
         setUserData({ ...userData, message: value });
     };
 
-    const sendPrivateValue = () => {
+    const handleClickToChooseImage = () => {
+        const input: any = document.getElementById('input-upload');
+        input.click();
+    };
+
+    const sendPrivateMessage = () => {
         if (userData.message)
             if (connection) {
                 var currentTime = new Date();
@@ -155,9 +164,29 @@ function Message() {
                     .invoke('SendPrivateMessage', tab, chatMessage)
                     .then(() => {
                         setUserData({ ...userData, message: '' });
+                        setImage(null);
                     })
                     .catch(onError);
             }
+    };
+
+    const uploadImageMessage = async (e: any) => {
+        const image = e.target.files[0];
+        if (!!image) {
+            const reader = new FileReader();
+            reader.onload = async function () {
+                setImage(image);
+            };
+            reader.readAsDataURL(image);
+            const formData = new FormData();
+            formData.append('image', image);
+            let result: any = await api.uploadFileRequest('/message/upload-message-image', formData);
+            if (result && result.statusCode === 200) {
+                const path = result.data.path;
+                setUserData({ ...userData, message: path });
+                setIsUploadImage(true);
+            }
+        }
     };
 
     return (
@@ -197,7 +226,16 @@ function Message() {
                                     <div className={styles.info_bottom}>
                                         <div className={styles.last_message}>
                                             {privateChats.get(item.id).length > 0 &&
-                                                privateChats.get(item.id)[privateChats.get(item.id).length - 1].content}
+                                                (privateChats
+                                                    .get(item.id)
+                                                    [privateChats.get(item.id).length - 1].content.includes(
+                                                        'res.cloudinary.com',
+                                                    ) ? (
+                                                    <i>Hình ảnh</i>
+                                                ) : (
+                                                    privateChats.get(item.id)[privateChats.get(item.id).length - 1]
+                                                        .content
+                                                ))}
                                         </div>
                                         {/* <div className={styles.unseen_message}>5</div> */}
                                     </div>
@@ -225,7 +263,16 @@ function Message() {
                                     />
                                     <div className={styles.message_block}>
                                         <div className={styles.message_name}>{item.senderName}</div>
-                                        <div className={styles.message_content}>{item.content}</div>
+                                        <div className={styles.message_content}>
+                                            {item.content.includes('res.cloudinary.com') ? (
+                                                <ImageModal
+                                                    imageUrl={item.content}
+                                                    style={{ width: '200px', height: '100px', objectFit: 'cover' }}
+                                                />
+                                            ) : (
+                                                item.content
+                                            )}
+                                        </div>
                                         <div className={styles.message_time}>
                                             {convertFromISODateWithTime(item.createdTime)}
                                         </div>
@@ -234,16 +281,24 @@ function Message() {
                             ))}
                     </div>
                     <div className={styles.message_bar}>
-                        <input
-                            disabled={tab === 1}
-                            onChange={handleMessage}
-                            className={styles.message_input}
-                            placeholder="Nhập tin nhắn đến admin"
-                            value={userData.message}
-                        />
-                        <button onClick={tab === 1 ? () => '' : sendPrivateValue} className={styles.message_send_btn}>
-                            <Icon path={mdiSend} size={2.5} />
-                        </button>
+                        {tab != 1 && (
+                            <>
+                                <input
+                                    onChange={handleMessage}
+                                    className={styles.message_input}
+                                    placeholder="Nhập tin nhắn đến admin"
+                                    value={userData.message.includes('res.cloudinary.com') ? '' : userData.message}
+                                />
+                                <input hidden onChange={uploadImageMessage} type="file" id="input-upload" />
+                                <button onClick={handleClickToChooseImage}>Chọn ảnh</button>
+                                <button onClick={sendPrivateMessage} className={styles.message_send_btn}>
+                                    <Icon path={mdiSend} size={2.5} />
+                                </button>
+                            </>
+                        )}
+                    </div>
+                    <div className={clsx('mb-5 ml-5', { ['opacity-20']: !isUploadImage })}>
+                        {image && <Image src={URL.createObjectURL(image)} alt="" width={100} height={100} />}
                     </div>
                 </div>
             </div>
