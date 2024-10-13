@@ -8,7 +8,6 @@ import RegisterSuccessModal from '~/components/register-success-modal';
 import User from '~/app/admin/user/page';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
-import { useRouter } from 'next/navigation';
 import SavingModal from '~/components/saving-modal';
 import { getUser } from '~/utils/localstorage';
 
@@ -35,11 +34,10 @@ function Login() {
         password: '',
     });
     const [processing, setProcessing] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         if (!!getUser()) {
-            router.push('/home');
+            window.location.pathname = '/home';
         }
     }, []);
 
@@ -128,7 +126,7 @@ function Login() {
                     notify('Đăng ký thành công');
                     localStorage.setItem('user', JSON.stringify(result.data.user));
                     localStorage.setItem('token', JSON.stringify(result.data.token));
-                    router.push('/home');
+                    window.location.pathname = '/home';
                 }
             } else {
                 notifyError('Đăng ký thất bại');
@@ -144,8 +142,8 @@ function Login() {
         if (result && result.statusCode === 200) {
             localStorage.setItem('user', JSON.stringify(result.data.user));
             localStorage.setItem('token', JSON.stringify(result.data.token));
-            if (result.data.user.roles.includes('admin')) router.push('/admin');
-            else router.push('/home');
+            if (result.data.user.roles.includes('admin')) window.location.pathname = '/home';
+            else window.location.pathname = '/home';
         } else {
             notifyError('Sai email hoặc mật khẩu');
         }

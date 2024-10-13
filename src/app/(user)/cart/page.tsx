@@ -1,14 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mdiCart, mdiTrashCanOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import VoucherModal from '~/components/voucher-modal';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { cartSelector, checkoutSelector, shippingSelector, voucherSelector } from '~/redux/selectors';
+import cartSlice, { changeCartQuantity, deleteFromCart } from '~/redux/slice/CartSlice';
+import voucherSlice from '~/redux/slice/VoucherSlice';
+import { notifyError } from '~/utils/notify';
 
 export default function Cart() {
     const [modal, setModal] = useState<boolean>(false);
+
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const cartItems = useSelector(cartSelector);
+    const voucher = useSelector(voucherSelector);
+    const checkoutProducts = useSelector(checkoutSelector);
+    const shipping = useSelector(shippingSelector);
+
+    console.log(cartItems);
+
+    useEffect(() => {
+        dispatch(cartSlice.actions.removeAllCheckoutProduct());
+        dispatch(voucherSlice.actions.addVoucher<any>({}));
+    }, []);
+
+    const handleDeleteCartItem = (cartItem: any) => {
+        dispatch(cartSlice.actions.removeCheckoutProduct(cartItem));
+        dispatch<any>(deleteFromCart(cartItem));
+    };
+
+    const handleChangeQuantity = (cartItem: any, quantity: any) => {
+        quantity = parseInt(quantity);
+        if (quantity > cartItem.productQuantity) {
+            notifyError('Số lượng sản phẩm lớn hơn sản phẩm có sẵn');
+            return;
+        }
+        if (quantity < 1) return;
+        const temp = { ...cartItem, quantity: quantity };
+        dispatch<any>(changeCartQuantity(temp));
+        dispatch(cartSlice.actions.changeCheckoutProduct(temp));
+    };
+
+    const handleOrder = () => {
+        if (checkoutProducts.length <= 0) notifyError('Chưa chọn sản phẩm');
+        else router.push('/take-order');
+    };
 
     return (
         <div className="max-w-[1360px] mx-auto">
@@ -34,116 +76,108 @@ export default function Cart() {
                             <td>Tổng tiền</td>
                             <td>Thao tác</td>
                         </tr>
-                        <tr style={{ borderBottom: '1px solid #ccc' }}>
-                            <td>
-                                <input type="checkbox" className="mr-5" />
-                            </td>
-                            <td className="">
-                                <Image
-                                    src={require('~/../public/images/1.jpeg')}
-                                    alt=""
-                                    height={10000}
-                                    width={10000}
-                                    className="w-20 h-20 object-cover mt-4 mb-4"
-                                />
-                            </td>
-                            <td>
-                                <div className="max-w-[600px]">
-                                    Vải thiều sấy khô Hồng Lam gói (500gr). Có vị thơm, ngọt nguyên chất từ vải thiều
-                                    Hưng Yên
-                                </div>
-                            </td>
-                            <td>
-                                <div className="ml-[-20px] font-semibold">₫140.700</div>
-                            </td>
-                            <td>
-                                <div className="flex items-center ml-[-10px]">
-                                    <button className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100">
-                                        -
-                                    </button>
+                        {cartItems?.map((item: any) => (
+                            <tr style={{ borderBottom: '1px solid #ccc' }}>
+                                <td>
                                     <input
-                                        value={12}
-                                        type="number"
-                                        className="w-12 border-solid border-black border-[1px] text-center pl-2"
+                                        onClick={(e: any) => {
+                                            e.target.checked && dispatch(cartSlice.actions.addCheckoutProduct(item));
+                                            !e.target.checked &&
+                                                dispatch(cartSlice.actions.removeCheckoutProduct(item));
+                                        }}
+                                        type="checkbox"
+                                        className="mr-5"
                                     />
-                                    <button className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100">
-                                        +
-                                    </button>
-                                </div>
-                            </td>
-                            <td className="primary-color font-semibold">₫140.700</td>
-                            <td>
-                                <Icon
-                                    path={mdiTrashCanOutline}
-                                    size={1}
-                                    color={'red'}
-                                    className="ml-6 cursor-pointer"
-                                />
-                            </td>
-                        </tr>
-                        <tr style={{ borderBottom: '1px solid #ccc' }}>
-                            <td>
-                                <input type="checkbox" className="mr-5" />
-                            </td>
-                            <td className="">
-                                <Image
-                                    src={require('~/../public/images/1.jpeg')}
-                                    alt=""
-                                    height={10000}
-                                    width={10000}
-                                    className="w-20 h-20 object-cover mt-4 mb-4"
-                                />
-                            </td>
-                            <td>
-                                <div className="max-w-[600px]">
-                                    Vải thiều sấy khô Hồng Lam gói (500gr). Có vị thơm, ngọt nguyên chất từ vải thiều
-                                    Hưng Yên
-                                </div>
-                            </td>
-                            <td>
-                                <div className="ml-[-20px] font-semibold">₫140.700</div>
-                            </td>
-                            <td>
-                                <div className="flex items-center ml-[-10px]">
-                                    <button className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100">
-                                        -
-                                    </button>
-                                    <input
-                                        value={12}
-                                        type="number"
-                                        className="w-12 border-solid border-black border-[1px] text-center pl-2"
+                                </td>
+                                <td className="">
+                                    <Image
+                                        src={item.thumbnail}
+                                        alt=""
+                                        height={10000}
+                                        width={10000}
+                                        className="w-20 h-20 object-cover mt-4 mb-4 border-solid border-[#ddd] border-[1px]"
                                     />
-                                    <button className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100">
-                                        +
-                                    </button>
-                                </div>
-                            </td>
-                            <td className="primary-color font-semibold">₫140.700</td>
-                            <td>
-                                <Icon
-                                    path={mdiTrashCanOutline}
-                                    size={1}
-                                    color={'red'}
-                                    className="ml-6 cursor-pointer"
-                                />
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <div className="max-w-[600px] min-w-[500px]">{item.name}</div>
+                                </td>
+                                <td>
+                                    <div className="ml-[-20px] font-semibold mr-[10px]">
+                                        {item.price.toLocaleString('vi-VN')} ₫/<sub>{item.unit}</sub>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="flex items-center ml-[-10px]">
+                                        <button
+                                            onClick={() => handleChangeQuantity(item, item.quantity - 1)}
+                                            className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100"
+                                        >
+                                            -
+                                        </button>
+                                        <input
+                                            onChange={(e) => handleChangeQuantity(item, e.target.value)}
+                                            value={item.quantity}
+                                            type="number"
+                                            className="w-12 border-solid border-black border-[1px] text-center pl-2"
+                                        />
+                                        <button
+                                            onClick={() => handleChangeQuantity(item, item.quantity + 1)}
+                                            className="px-2 border-solid border-black border-[1px] h-[25px] bg-slate-100"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </td>
+                                <td className="primary-color font-semibold">
+                                    ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                </td>
+                                <td>
+                                    <div onClick={() => handleDeleteCartItem(item)}>
+                                        <Icon
+                                            path={mdiTrashCanOutline}
+                                            size={1}
+                                            color={'red'}
+                                            className="ml-6 cursor-pointer"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
                 <div className="flex justify-between items-center mt-10 text-lg">
                     <button onClick={() => setModal(true)} className="text-red-500">
                         🏷️ Chọn voucher
                     </button>
-                    <div className="text-red-500">Mã voucher: MAGIAM15%</div>
+                    <div className="text-red-500">Mã voucher: {voucher.name}</div>
                     <div className="flex items-center">
-                        Tổng thanh toán (0 Sản phẩm):{' '}
-                        <span className="primary-color text-2xl font-bold ml-2 mr-2">₫0</span>
-                        <Link
-                            href={'/take-order'}
+                        Tổng thanh toán ({checkoutProducts.length} Sản phẩm):{' '}
+                        <span className="primary-color text-2xl font-bold ml-2 mr-2">
+                            ₫
+                            {(voucher.discountPercent
+                                ? checkoutProducts.reduce((acc: any, item: any) => {
+                                      return acc + item.quantity * item.price;
+                                  }, 0) *
+                                      ((voucher.discountPercent ?? 0) / 100) <=
+                                  voucher.maxDiscount
+                                    ? checkoutProducts.reduce((acc: any, item: any) => {
+                                          return acc + item.quantity * item.price;
+                                      }, 0) *
+                                      ((100 - (voucher.discountPercent ?? 0)) / 100)
+                                    : checkoutProducts.reduce((acc: any, item: any) => {
+                                          return acc + item.quantity * item.price;
+                                      }, 0) - voucher.maxDiscount
+                                : checkoutProducts.reduce((acc: any, item: any) => {
+                                      return acc + item.quantity * item.price;
+                                  }, 0)
+                            ).toLocaleString('vi-VN')}
+                        </span>
+                        <div
+                            onClick={handleOrder}
                             className="w-[200px] h-[40px] flex justify-center items-center bg-[var(--primary-color)] ml-2 rounded-md text-white hover:bg-green-800 text-[17px]"
                         >
                             MUA HÀNG
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </div>

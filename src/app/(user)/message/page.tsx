@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import Icon from '@mdi/react';
-import { mdiSend } from '@mdi/js';
+import { mdiImage, mdiSend } from '@mdi/js';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import * as signalR from '@microsoft/signalr';
@@ -10,13 +10,12 @@ import * as signalR from '@microsoft/signalr';
 import styles from './message.module.scss';
 import { getToken, getUser } from '~/utils/localstorage';
 import { config } from '~/utils/config';
-import { convertFromISODateWithTime } from '~/utils/date-formatter';
+import { convertFromISODateWithTime, convertToISODate, convertToISOWithTime } from '~/utils/date-formatter';
 import api from '~/utils/api';
 import ImageModal from '~/components/image-modal';
 
 let connection: any = null;
 let connected = false;
-let subscribed = false;
 function Message() {
     const ref: any = useRef();
     const [privateChats, setPrivateChats] = useState<any>(new Map());
@@ -56,8 +55,6 @@ function Message() {
             .then(() => onConnected())
             .catch(onError);
 
-        subscribed = true;
-
         return () => {
             if (connection) {
                 connection.stop();
@@ -66,7 +63,6 @@ function Message() {
     }, []);
 
     const pushPrivateMessage = (payload: any) => {
-        console.log(payload);
         privateChats.get(payload.senderId).push(payload);
         setPrivateChats(new Map(privateChats));
     };
@@ -126,6 +122,7 @@ function Message() {
     const handleMessage = (e: any) => {
         const { value } = e.target;
         setUserData({ ...userData, message: value });
+        setImage(null);
     };
 
     const handleClickToChooseImage = () => {
@@ -150,7 +147,7 @@ function Message() {
                     receiverId: tab,
                     content: userData.message,
                     isRead: false,
-                    createdTime: formattedDate,
+                    createdTime: convertToISOWithTime(formattedDate),
                     senderName: userData.userName,
                     avatar: userData.avatar,
                 };
@@ -165,6 +162,7 @@ function Message() {
                     .then(() => {
                         setUserData({ ...userData, message: '' });
                         setImage(null);
+                        setIsUploadImage(false);
                     })
                     .catch(onError);
             }
@@ -288,9 +286,12 @@ function Message() {
                                     className={styles.message_input}
                                     placeholder="Nhập tin nhắn đến admin"
                                     value={userData.message.includes('res.cloudinary.com') ? '' : userData.message}
+                                    style={{ paddingRight: '50px' }}
                                 />
                                 <input hidden onChange={uploadImageMessage} type="file" id="input-upload" />
-                                <button onClick={handleClickToChooseImage}>Chọn ảnh</button>
+                                <button className="ml-[-50px] mr-10" onClick={handleClickToChooseImage}>
+                                    <Icon path={mdiImage} size={1.4} />
+                                </button>
                                 <button onClick={sendPrivateMessage} className={styles.message_send_btn}>
                                     <Icon path={mdiSend} size={2.5} />
                                 </button>

@@ -33,6 +33,14 @@ function convertToISODate(dateString: string) {
     return date.toISOString();
 }
 
+function convertToISOWithTime(dateString: string) {
+    const [time, date] = dateString.split(' ');
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    const [day, month, year] = date.split('/').map(Number);
+    const isoDate = new Date(year, month - 1, day, hours, minutes, seconds);
+    return isoDate.toISOString();
+}
+
 function getCurrentDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -47,4 +55,5 @@ export {
     convertToISODate,
     convertFromISODateExcludeYear,
     getCurrentDate,
+    convertToISOWithTime,
 };

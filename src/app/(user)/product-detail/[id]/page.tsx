@@ -16,6 +16,8 @@ import { notify, notifyError } from '~/utils/notify';
 import Paginate from '~/components/pagination/pagination';
 import { convertFromISODateWithTime } from '~/utils/date-formatter';
 import SavingModal from '~/components/saving-modal';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '~/redux/slice/CartSlice';
 
 function ProductDetail({ params }: { params: { id: string } }) {
     const [product, setProduct] = useState<any>({ thumbnail: '', star: 1 });
@@ -27,12 +29,11 @@ function ProductDetail({ params }: { params: { id: string } }) {
     const [totalPage, setTotalpage] = useState<any>(1);
     const [page, setPage] = useState<any>(1);
     const [rate, setRate] = useState<any>();
-    const [cartItem, setCartItem] = useState<any>({ userId: getUser().id, productId: null, quantity: 1 });
+    const [cartItem, setCartItem] = useState<any>({ userId: getUser().id, productId: params.id, quantity: 1 });
     const [savingModal, setSavingModal] = useState<boolean>(false);
 
     const id = params.id;
-
-    //const dispatch = useDispatch();
+    const dispatch: any = useDispatch();
 
     const htmlContent = {
         __html: product && product?.fullDescription,
@@ -131,12 +132,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
     };
 
     const handleAddToCart = () => {
-        // if (!!size && cartItem.quantity > 0) {
-        //     dispatch(addToCart(cartItem));
-        //     notify('Thêm vào giỏ hàng thành công', 'top-center');
-        // } else {
-        //     notifyError('Chưa kích thước chọn sản phẩm');
-        // }
+        console.log(cartItem);
+        if (cartItem.quantity > 0) {
+            dispatch(addToCart(cartItem));
+            notify('Thêm vào giỏ hàng thành công', 'top-center');
+        } else {
+            notifyError('Số lượng sản phẩm phải lớn hơn 0');
+        }
     };
 
     const handleChangeComment = (e: any) => {
@@ -202,6 +204,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                 width={1000}
                                 height={1000}
                                 className=" object-cover w-[450px] h-[450px]"
+                                priority
                             />
                         </div>
                         <div className={styles.product_left_sub_image}>
@@ -307,7 +310,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                             </div>
                         </div>
                         <div className={styles.product_right_btn}>
-                            <button className={styles.product_right_btn_add}>
+                            <button onClick={handleAddToCart} className={styles.product_right_btn_add}>
                                 <Icon path={mdiCartOutline} size={1.5} />
                                 THÊM VÀO GIỎ HÀNG
                             </button>

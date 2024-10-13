@@ -13,6 +13,9 @@ import { mdiCartVariant, mdiMessageText } from '@mdi/js';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { getUser } from '~/utils/localstorage';
+import { useDispatch, useSelector } from 'react-redux';
+import { cartSelector } from '~/redux/selectors';
+import { getCart } from '~/redux/slice/CartSlice';
 const HeaderLoginLink = dynamic(() => import('~/components/layouts/user/header-login-link'), { ssr: false });
 
 function Header() {
@@ -20,10 +23,13 @@ function Header() {
     const [fixed, setFixed] = useState(false);
     const pathname = usePathname();
     const [user, setUser] = useState<any>({ avatar: null });
+    const cartItems = useSelector(cartSelector);
+    const dispatch: any = useDispatch();
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         setUser(getUser());
+        dispatch(getCart());
     }, []);
 
     useEffect(() => {
@@ -128,7 +134,7 @@ function Header() {
                     <Link href="/cart" className="mx-1.5 relative">
                         <Icon path={mdiCartVariant} size={1} className="hover:primary-color cursor-pointer" />
                         <div className="absolute top-[-10px] right-[-5px] w-[18px] h-[20px] bg-[#ff0000] text-white text-sm text-center rounded-full">
-                            1
+                            {cartItems.length}
                         </div>
                     </Link>
                     {user && (
