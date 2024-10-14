@@ -7,10 +7,102 @@ import Image from 'next/image';
 import VoucherModal from '~/components/voucher-modal';
 import clsx from 'clsx';
 import AddressModal from '~/components/address-modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { addressSelector, checkoutSelector, voucherSelector } from '~/redux/selectors';
 
 function TakeOrder() {
     const [voucherModal, setVoucherModal] = useState<boolean>(false);
     const [addressModal, setAddressModal] = useState<boolean>(false);
+    const [note, setNote] = useState();
+    const [payment, setPayment] = useState();
+    const [shippingFee, setShippingFee] = useState(0);
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    const voucher = useSelector(voucherSelector);
+    const checkoutProducts = useSelector(checkoutSelector);
+    const address = useSelector(addressSelector);
+
+    const calculateShippingFee = async () => {
+        if (!!address?.district?.DistrictID) {
+            console.log(1);
+            let params = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Token: 'f2795b86-89e9-11ef-9b94-5ef2ee6a743d',
+                },
+                body: JSON.stringify({
+                    shop_id: 5387453,
+                    from_district: 1576,
+                    to_district: address.district.DistrictID,
+                }),
+            };
+            let res = await fetch(
+                'https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services',
+                params,
+            );
+            let data = await res.json();
+            if (data.code === 200) {
+                params = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Token: 'f2795b86-89e9-11ef-9b94-5ef2ee6a743d',
+                    },
+                    body: JSON.stringify({
+                        service_id: data.data[0].service_id,
+                        insurance_value: 500000,
+                        coupon: null,
+                        from_district_id: 1576,
+                        to_district_id: address.district.DistrictID,
+                        to_ward_code: address.ward.WardCode,
+                        height: 15,
+                        length: 15,
+                        weight: checkoutProducts.reduce((acc: any, item: any) => acc + item.quantity, 0),
+                        width: 15,
+                    }),
+                };
+                res = await fetch('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', params);
+                data = await res.json();
+                if (data.code === 200) {
+                    setShippingFee(data.data.service_fee);
+                }
+            }
+        }
+    };
+
+    let total = voucher.discountPercent
+        ? checkoutProducts.reduce((acc: any, item: any) => {
+              return acc + item.quantity * item.price;
+          }, 0) *
+              ((voucher.discountPercent ?? 0) / 100) <=
+          voucher.maxDiscount
+            ? checkoutProducts.reduce((acc: any, item: any) => {
+                  return acc + item.quantity * item.price;
+              }, 0) *
+              ((100 - (voucher.discountPercent ?? 0)) / 100)
+            : checkoutProducts.reduce((acc: any, item: any) => {
+                  return acc + item.quantity * item.price;
+              }, 0) - voucher.maxDiscount
+        : checkoutProducts.reduce((acc: any, item: any) => {
+              return acc + item.quantity * item.price;
+          }, 0);
+
+    let discountVoucher = voucher.discountPercent
+        ? checkoutProducts.reduce((acc: any, item: any) => {
+              return acc + item.quantity * item.price;
+          }, 0) *
+              ((voucher.discountPercent ?? 0) / 100) <=
+          voucher.maxDiscount
+            ? checkoutProducts.reduce((acc: any, item: any) => {
+                  return acc + item.quantity * item.price;
+              }, 0) *
+              ((voucher.discountPercent ?? 0) / 100)
+            : voucher.maxDiscount
+        : 0;
 
     return (
         <>
@@ -36,9 +128,19 @@ function TakeOrder() {
                                 Địa Chỉ Nhận Hàng
                             </div>
                             <div className="flex justify-between items-center mt-2">
-                                <div className="font-bold">Admin (06155113584)</div>
+                                <div className="font-bold">
+                                    {address?.name && address?.name} {address.phone && '(' + address?.phone + ')'}
+                                </div>
                                 <div className="text-gray-700">
-                                    Phường Xã Thượng Phùng, Quận Huyện Mèo Vạc, Tỉnh Hà Giang
+                                    {address?.street
+                                        ? address.street +
+                                          ', ' +
+                                          address.ward?.WardName +
+                                          ', ' +
+                                          address.district?.DistrictName +
+                                          ', ' +
+                                          address.city?.ProvinceName
+                                        : ''}
                                 </div>
                                 <button
                                     onClick={() => setAddressModal(true)}
@@ -63,66 +165,44 @@ function TakeOrder() {
                                         <td>Số lượng</td>
                                         <td>Tổng tiền</td>
                                     </tr>
-                                    <tr style={{ borderBottom: '1px solid #ccc' }}>
-                                        <td className="">
-                                            <Image
-                                                src={require('~/../public/images/1.jpeg')}
-                                                alt=""
-                                                height={10000}
-                                                width={10000}
-                                                className="w-20 h-20 object-cover mt-4 mb-4 ml-3"
-                                            />
-                                        </td>
-                                        <td>
-                                            <div className="max-w-[600px]">
-                                                Vải thiều sấy khô Hồng Lam gói (500gr). Có vị thơm, ngọt nguyên chất từ
-                                                vải thiều Hưng Yên
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="ml-[-20px] font-semibold">₫140.700</div>
-                                        </td>
-                                        <td>
-                                            <div className="w-full text-center pr-4">1</div>
-                                        </td>
-                                        <td className="primary-color font-semibold">₫140.700</td>
-                                    </tr>
-                                    <tr style={{ borderBottom: '1px solid #ccc' }}>
-                                        <td className="">
-                                            <Image
-                                                src={require('~/../public/images/1.jpeg')}
-                                                alt=""
-                                                height={10000}
-                                                width={10000}
-                                                className="w-20 h-20 object-cover mt-4 mb-4 ml-3"
-                                            />
-                                        </td>
-                                        <td>
-                                            <div className="max-w-[600px]">
-                                                Vải thiều sấy khô Hồng Lam gói (500gr). Có vị thơm, ngọt nguyên chất từ
-                                                vải thiều Hưng Yên
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="ml-[-20px] font-semibold">₫140.700</div>
-                                        </td>
-                                        <td>
-                                            <div className="w-full text-center pr-4">1</div>
-                                        </td>
-                                        <td className="primary-color font-semibold">₫140.700</td>
-                                    </tr>
+                                    {checkoutProducts?.map((item: any) => (
+                                        <tr style={{ borderBottom: '1px solid #ccc' }}>
+                                            <td className="">
+                                                <Image
+                                                    src={item.thumbnail}
+                                                    alt=""
+                                                    height={10000}
+                                                    width={10000}
+                                                    className="w-20 h-20 object-cover mt-4 mb-4 ml-3"
+                                                />
+                                            </td>
+                                            <td>
+                                                <div className="max-w-[600px] min-w-[500px]">{item.name}</div>
+                                            </td>
+                                            <td>
+                                                <div className="ml-[-20px] font-semibold">
+                                                    {item.price.toLocaleString('vi-VN')}₫/<sub>{item.unit}</sub>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="w-full text-center pr-4">
+                                                    {item.quantity}
+                                                    {item.unit}
+                                                </div>
+                                            </td>
+                                            <td className="primary-color font-semibold">
+                                                ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                             <div className="flex justify-between items-start my-3 pr-6">
-                                <div>Chọn đơn vị vận chuyển</div>
+                                <div>Đơn vị vận chuyển</div>
                                 <div>
                                     <div>
-                                        <input name="shipping" type="radio" className="mr-4" />
-                                        Giao hàng nhanh - ₫50.000
-                                    </div>
-                                    <div>
-                                        <input name="shipping" type="radio" className="mr-4" />
-                                        Giao hàng tiết kiệm - ₫10.000
+                                        <input checked name="shipping" type="radio" className="mr-4" />
+                                        Giao hàng nhanh - ₫{shippingFee.toLocaleString('vi-VN')}
                                     </div>
                                 </div>
                             </div>
@@ -131,7 +211,7 @@ function TakeOrder() {
                                 <button onClick={() => setVoucherModal(true)} className="text-red-500">
                                     🏷️ Chọn voucher
                                 </button>
-                                <div className="text-red-500">Mã voucher: MAGIAM15%</div>
+                                <div className="text-red-500">Mã voucher: {voucher?.name}</div>
                                 <div className="flex items-center text-[16px]">
                                     Lời nhắn:
                                     <input
@@ -192,19 +272,28 @@ function TakeOrder() {
                             <div className="text-gray-600 text-[15px] w-[300px]">
                                 <div className="mb-4 flex justify-between items-center">
                                     <div>Tổng tiền hàng:</div>
-                                    <div>₫422.100</div>
+                                    <div>
+                                        ₫
+                                        {checkoutProducts
+                                            .reduce((acc: any, item: any) => {
+                                                return acc + item.quantity * item.price;
+                                            }, 0)
+                                            .toLocaleString('vi-VN')}
+                                    </div>
                                 </div>
                                 <div className="mb-4 flex justify-between items-center">
                                     <div>Tổng cộng Voucher giảm giá:</div>
-                                    <div>₫422.100</div>
+                                    <div>-₫{discountVoucher.toLocaleString('vi-VN')}</div>
                                 </div>
                                 <div className="mb-4 flex justify-between items-center">
                                     <div>Phí vận chuyển:</div>
-                                    <div>₫422.100</div>
+                                    <div>₫{shippingFee.toLocaleString('vi-VN')}</div>
                                 </div>
                                 <div className="mb-4 flex justify-between items-center">
                                     <div>Tổng thanh toán:</div>
-                                    <div className="text-3xl primary-color">₫422.100</div>
+                                    <div className="text-3xl primary-color">
+                                        ₫{(total + shippingFee).toLocaleString('vi-VN')}
+                                    </div>
                                 </div>
                                 <button className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700">
                                     ĐẶT HÀNG
@@ -215,7 +304,7 @@ function TakeOrder() {
                 </div>
             </div>
             {voucherModal && <VoucherModal setModal={setVoucherModal} />}
-            {addressModal && <AddressModal setModal={setAddressModal} />}
+            {addressModal && <AddressModal setModal={setAddressModal} calculateShippingFee={calculateShippingFee} />}
         </>
     );
 }

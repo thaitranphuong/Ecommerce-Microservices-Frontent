@@ -174,7 +174,7 @@ export default function Cart() {
                         </span>
                         <div
                             onClick={handleOrder}
-                            className="w-[200px] h-[40px] flex justify-center items-center bg-[var(--primary-color)] ml-2 rounded-md text-white hover:bg-green-800 text-[17px]"
+                            className="w-[200px] h-[40px] flex justify-center items-center bg-[var(--primary-color)] ml-2 rounded-md text-white hover:bg-green-800 text-[17px] cursor-pointer"
                         >
                             MUA HÀNG
                         </div>
