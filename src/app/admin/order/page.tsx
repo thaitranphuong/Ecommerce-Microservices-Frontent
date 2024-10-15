@@ -6,48 +6,82 @@ import { mdiDeveloperBoard, mdiPen, mdiTrashCan } from '@mdi/js';
 import Wrapper from '~/components/layouts/admin/wrapper';
 import ExcelButton from '~/components/excel-button/excel-button';
 import Pagination from '~/components/pagination/pagination';
-import SearchBar from '~/components/search-bar/search-bar';
-import AddButton from '~/components/add-button/add-button';
 import styles from './order.module.scss';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Excel from '~/components/excel/excel';
 import Select from '~/components/select/select';
+import api from '~/utils/api';
+import { convertFromISODateWithTime } from '~/utils/date-formatter';
+import Excel from '~/components/excel/excel';
 
 function Order() {
-    const array: { id: any; name: string }[] = [
+    const [orders, setOrders] = useState([]);
+    const [totalPage, setTotalpage] = useState(1);
+    const [page, setPage] = useState(1);
+    const [status, setStatus] = useState(0);
+
+    const render = async () => {
+        let result = await api.getRequest(`/order/get-all?page=${page}&limit=5&status=${status}`);
+        setTotalpage(result.data.totalPage);
+        setPage(result.data.page);
+        setOrders(result.data.listResult);
+    };
+
+    useEffect(() => {
+        render();
+    }, [page, status]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [status]);
+
+    const array: { id: number; name: string }[] = [
         {
-            id: '',
+            id: 0,
             name: 'Tất cả',
         },
         {
-            id: 0,
+            id: 1,
             name: 'Chờ xác nhận',
         },
         {
-            id: 1,
+            id: 2,
             name: 'Đang chuẩn bị hàng',
         },
         {
-            id: 2,
+            id: 3,
             name: 'Đang giao',
         },
         {
-            id: 3,
+            id: 4,
             name: 'Đã giao',
         },
         {
-            id: 4,
+            id: 5,
             name: 'Đã hủy',
         },
     ];
+
+    const handleExportFile = async () => {
+        const listExcel: any = [];
+        let result = await api.getRequest(`/order/get-all?page=1&limit=100&status=0`);
+        result.data.listResult.forEach((item: any) => {
+            listExcel.push({ ...item });
+        });
+        await Excel.exportExcel([...listExcel], 'Danh sách', 'Danh sách');
+    };
     return (
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý đơn hàng" detail="Danh sách đơn hàng">
                 <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Select width="300px" array={array} label="" onChange={{}} value={''} name={''} />
+                    <Select
+                        width="300px"
+                        array={array}
+                        onChange={(e: any) => setStatus(e.target.value)}
+                        value={status}
+                    />
                     <div>
-                        <ExcelButton onClick={{}} />
+                        <ExcelButton onClick={handleExportFile} />
                     </div>
                 </div>
                 <table
@@ -65,35 +99,36 @@ function Order() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr key={1}>
-                            <td>1</td>
-                            <td>asdas</td>
-                            <td>asdsad</td>
-                            <td>asdsad</td>
-                            <td>asdsad</td>
-                            <td>
-                                Chờ xác nhận
-                                {/* {(item.status === 0 && 'Chờ xác nhận') ||
-                                    (item.status === 1 && 'Đang chuẩn bị hàng') ||
-                                    (item.status === 2 && 'Đang giao hàng') ||
-                                    (item.status === 3 && 'Đã nhận hàng') ||
-                                    (item.status === 4 && 'Đã hủy đơn')} */}
-                            </td>
-                            <td>
-                                <div className="flex justify-center">
-                                    <Link
-                                        href={'/admin/edit-order/' + 1}
-                                        style={{ color: 'orange', cursor: 'pointer' }}
-                                    >
-                                        <Icon path={mdiDeveloperBoard} size={2} />
-                                    </Link>
-                                </div>
-                            </td>
-                        </tr>
+                        {orders?.map((item: any, index: number) => (
+                            <tr key={item.id}>
+                                <td>{index + 1 + (page - 1) * 5}</td>
+                                <td>{item.customerName}</td>
+                                <td>{item.phoneNumber}</td>
+                                <td>{convertFromISODateWithTime(item.createdTime)}</td>
+                                <td>{item.transportMethod}</td>
+                                <td>
+                                    {(item.status === 1 && 'Chờ xác nhận') ||
+                                        (item.status === 2 && 'Đang chuẩn bị hàng') ||
+                                        (item.status === 3 && 'Đang giao hàng') ||
+                                        (item.status === 4 && 'Đã nhận hàng') ||
+                                        (item.status === 5 && 'Đã hủy đơn')}
+                                </td>
+                                <td>
+                                    <div className="flex justify-center">
+                                        <Link
+                                            href={'/admin/edit-order/' + item.id}
+                                            style={{ color: 'blue', cursor: 'pointer' }}
+                                        >
+                                            <Icon path={mdiDeveloperBoard} size={2} />
+                                        </Link>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
                 <div style={{ width: '100%' }}>
-                    <Pagination page={1} setPage={{}} totalPage={4} />
+                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
                 </div>
             </Wrapper>
         </div>

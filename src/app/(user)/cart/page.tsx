@@ -21,13 +21,13 @@ export default function Cart() {
     const cartItems = useSelector(cartSelector);
     const voucher = useSelector(voucherSelector);
     const checkoutProducts = useSelector(checkoutSelector);
-    const shipping = useSelector(shippingSelector);
 
     console.log(cartItems);
 
     useEffect(() => {
         dispatch(cartSlice.actions.removeAllCheckoutProduct());
         dispatch(voucherSlice.actions.addVoucher<any>({}));
+        localStorage.removeItem('order');
     }, []);
 
     const handleDeleteCartItem = (cartItem: any) => {

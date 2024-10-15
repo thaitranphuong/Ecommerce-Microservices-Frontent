@@ -128,25 +128,31 @@ function Header() {
                     </Link>
                 </div>
                 <div className="flex">
-                    <Link href="/message" className="mx-1.5">
-                        <Icon path={mdiMessageText} size={1} className="hover:primary-color cursor-pointer"></Icon>
-                    </Link>
-                    <Link href="/cart" className="mx-1.5 relative">
-                        <Icon path={mdiCartVariant} size={1} className="hover:primary-color cursor-pointer" />
-                        <div className="absolute top-[-10px] right-[-5px] w-[18px] h-[20px] bg-[#ff0000] text-white text-sm text-center rounded-full">
-                            {cartItems.length}
-                        </div>
-                    </Link>
                     {user && (
-                        <Link href="/auth/account/info" className="ml-2 mb-px">
-                            <Image
-                                src={!!user.avatar ? user.avatar : avatar}
-                                alt=""
-                                className="w-[25px] h-[25px] object-cover rounded-full"
-                                width={1000}
-                                height={1000}
-                            ></Image>
-                        </Link>
+                        <>
+                            <Link href="/message" className="mx-1.5">
+                                <Icon
+                                    path={mdiMessageText}
+                                    size={1}
+                                    className="hover:primary-color cursor-pointer"
+                                ></Icon>
+                            </Link>
+                            <Link href="/cart" className="mx-1.5 relative">
+                                <Icon path={mdiCartVariant} size={1} className="hover:primary-color cursor-pointer" />
+                                <div className="absolute top-[-10px] right-[-5px] w-[18px] h-[20px] bg-[#ff0000] text-white text-sm text-center rounded-full">
+                                    {cartItems.length}
+                                </div>
+                            </Link>
+                            <Link href="/auth/account/info" className="ml-2 mb-px">
+                                <Image
+                                    src={!!user.avatar ? user.avatar : avatar}
+                                    alt=""
+                                    className="w-[25px] h-[25px] object-cover rounded-full"
+                                    width={1000}
+                                    height={1000}
+                                ></Image>
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>

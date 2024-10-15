@@ -9,6 +9,7 @@ import SavingModal from '~/components/saving-modal';
 import api from '~/utils/api';
 import { convertFromISODateWithTime } from '~/utils/date-formatter';
 import { getUser } from '~/utils/localstorage';
+import { notifyError } from '~/utils/notify';
 
 export default function BlogDetail() {
     const [blog, setBlog] = useState<any>();
@@ -45,6 +46,10 @@ export default function BlogDetail() {
     }, []);
 
     const handleSubmit = async () => {
+        if (!getUser()) {
+            notifyError('Bạn chưa đăng nhập!');
+            return;
+        }
         if (!!comment.content) {
             setSavingModal(true);
             await api.postRequest('/blog/comment/create', comment);

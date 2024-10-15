@@ -8,23 +8,35 @@ import styles from './edit-order.module.scss';
 import { useEffect, useState } from 'react';
 import Wrapper from '~/components/layouts/admin/wrapper';
 import Image from 'next/image';
-import ImageModal from '~/components/image-modal';
-function ViewOrder() {
-    const [order, setOrder] = useState({});
+import api from '~/utils/api';
+import Link from 'next/link';
 
-    const render = async () => {};
+function ViewOrder({ params }: { params: { id: string } }) {
+    const [order, setOrder] = useState<any>({});
+
+    const render = async () => {
+        let result = await api.getRequest(`/order/get/${params.id}`);
+        if (result?.statusCode === 200) setOrder(result.data);
+    };
+
+    console.log(order);
 
     useEffect(() => {
         render();
     }, []);
 
-    const handleChangeStatus = async (status: any) => {};
+    const handleChangeStatus = async (status: number) => {
+        let result = await api.getRequest(`/order/update?id=${params.id}&status=${status}`);
+        if (result && result.statusCode === 200) render();
+    };
 
     return (
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý đơn hàng" detail="Chi tiết đơn hàng">
                 <div className={styles.inner_wrapper}>
-                    <div className={styles.account}>Tài khoản khách hàng: asdasd</div>
+                    <Link href={`/admin/edit-user/${order.userId}`} className={styles.account}>
+                        Tài khoản: {order.userName}
+                    </Link>
                     <div className={styles.address}>
                         <div className={styles.address_border_top}></div>
                         <div className={styles.address_title}>
@@ -32,8 +44,10 @@ function ViewOrder() {
                             &nbsp; Địa Chỉ Nhận Hàng
                         </div>
                         <div className={styles.address_info}>
-                            <div className={styles.address_info_name}>asdasdasd (1221212121)</div>
-                            <div className={styles.address_info_specific}>adasdsa, asdasdasd, adas, asdsadadasda</div>
+                            <div className={styles.address_info_name}>
+                                {order?.customerName} ({order?.phoneNumber})
+                            </div>
+                            <div className={styles.address_info_specific}>{order?.address}</div>
                         </div>
                     </div>
 
@@ -48,21 +62,28 @@ function ViewOrder() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr key={1}>
-                                    <td className={styles.product}>
-                                        <Image
-                                            className={styles.product_img}
-                                            src={require('~/../public/images/nho-my.jpg')}
-                                            alt=""
-                                            width={1000}
-                                            height={1000}
-                                        />
-                                        Nho my dasdasdas as dsa dad as
-                                    </td>
-                                    <td className={styles.price}>₫{(10000000).toLocaleString('vi-VN')}</td>
-                                    <td className={styles.quantity}>{2}</td>
-                                    <td className={styles.total}>₫{(100000000).toLocaleString('vi-VN')}</td>
-                                </tr>
+                                {order?.orderDetails?.map((item: any) => (
+                                    <tr key={item.productId}>
+                                        <td className={styles.product}>
+                                            <Image
+                                                className={styles.product_img}
+                                                src={item.thumbnail}
+                                                alt=""
+                                                width={500}
+                                                height={500}
+                                            />
+                                            {item.name}
+                                        </td>
+                                        <td className={styles.price}>₫{item.price.toLocaleString('vi-VN')}</td>
+                                        <td className={styles.quantity}>
+                                            {item.quantity}
+                                            {item.unit}
+                                        </td>
+                                        <td className={styles.total}>
+                                            ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
 
@@ -71,82 +92,101 @@ function ViewOrder() {
                             <div className={styles.transport_list}>
                                 <div className={styles.transport_item}>
                                     <div className={styles.transport_item_text}>
-                                        Giao hang nhanh - ₫{(100000).toLocaleString('vi-VN')}
+                                        {order?.transportMethod} - ₫{order?.transportFee?.toLocaleString('vi-VN')}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className={styles.footer}>
-                            <div className={styles.footer_left}>🏷️ Voucher</div>
-                            <div className={styles.footer_left}>Mã voucher: MAGIAM123</div>
+                            <div className={styles.footer_left}>Voucher giảm giá: {order?.voucherName}</div>
                             <div className={styles.footer_right}>
                                 Lời nhắn:
-                                <input disabled className={styles.footer_right_input} value={'asdasdasdasdas'} />
+                                <input disabled className={styles.footer_right_input} value={order.note} />
                             </div>
                         </div>
                     </div>
                     <div className={styles.payment}>
                         <div className={styles.payment_top}>
                             <div className={styles.payment_title}>Phương thức thanh toán</div>
-                            <div className={clsx(styles.payment_option)}>VNPAY</div>
+                            <div className={clsx(styles.payment_option)}>
+                                {order.paymentMethod === 0 && 'COD'}
+                                {order.paymentMethod === 1 && 'VNPAY'}
+                                {order.paymentMethod === 2 && 'PAYPAL'}
+                            </div>
                         </div>
                         <div className={styles.payment_top}>
                             <div className={styles.payment_title}>Trạng thái đơn hàng</div>
-                            {(0 * 1 === 0 && <div className={clsx(styles.payment_option)}>Chờ xác nhận</div>) ||
-                                (0 * 1 === 1 && (
-                                    <div className={clsx(styles.payment_option)}>Đang chuẩn bị hàng</div>
-                                )) ||
-                                (0 * 1 === 2 && <div className={clsx(styles.payment_option)}>Đang giao hàng</div>) ||
-                                (0 * 1 === 3 && <div className={clsx(styles.payment_option)}>Đã giao hàng</div>) ||
-                                (0 * 1 === 4 && <div className={clsx(styles.payment_option)}>Đã hủy</div>)}
+                            {order.status === 1 && <div className={clsx(styles.payment_option)}>Chờ xác nhận</div>}
+                            {order.status === 2 && (
+                                <div className={clsx(styles.payment_option)}>Đang chuẩn bị hàng</div>
+                            )}
+                            {order.status === 3 && <div className={clsx(styles.payment_option)}>Đang giao hàng</div>}
+                            {order.status === 4 && <div className={clsx(styles.payment_option)}>Đã giao hàng</div>}
+                            {order.status === 5 && <div className={clsx(styles.payment_option)}>Đã hủy</div>}
                         </div>
 
                         <div className={styles.payment_bottom}>
                             <div className={styles.payment_bottom_item}>
                                 <div className={styles.payment_bottom_left}>Tổng tiền hàng</div>
-                                <div className={styles.payment_bottom_right}>₫{(10000000).toLocaleString('vi-VN')}</div>
+                                <div className={styles.payment_bottom_right}>
+                                    ₫
+                                    {order &&
+                                        order.orderDetails &&
+                                        order.orderDetails
+                                            .reduce((acc: number, item: any) => acc + item.price * item.quantity, 0)
+                                            .toLocaleString('vi-VN')}
+                                </div>
                             </div>
                             <div className={styles.payment_bottom_item}>
                                 <div className={styles.payment_bottom_left}>Phí vận chuyển</div>
-                                <div className={styles.payment_bottom_right}>₫{(1000000).toLocaleString('vi-VN')}</div>
+                                <div className={styles.payment_bottom_right}>
+                                    ₫{order?.transportFee?.toLocaleString('vi-VN')}
+                                </div>
                             </div>
                             <div className={styles.payment_bottom_item}>
                                 <div className={styles.payment_bottom_left}>Tổng cộng Voucher giảm giá:</div>
-                                <div className={styles.payment_bottom_right}>-₫{(1000000).toLocaleString('vi-VN')}</div>
+                                <div className={styles.payment_bottom_right}>
+                                    -₫
+                                    {order &&
+                                        order.orderDetails &&
+                                        (order.orderDetails.reduce(
+                                            (acc: number, item: any) => acc + item.price * item.quantity,
+                                            0,
+                                        ) *
+                                            order.voucherDiscountPercent <=
+                                        order.voucherMaxDiscount
+                                            ? order.orderDetails.reduce(
+                                                  (acc: number, item: any) => acc + item.price * item.quantity,
+                                                  0,
+                                              ) * order.voucherDiscountPercent
+                                            : order.voucherMaxDiscount
+                                        ).toLocaleString('vi-VN')}
+                                </div>
                             </div>
                             <div className={styles.payment_bottom_item}>
                                 <div className={styles.payment_bottom_left}>Tổng thanh toán</div>
                                 <div className={clsx(styles.payment_bottom_right, styles.payment_bottom_total)}>
-                                    ₫{(1000000).toLocaleString('vi-VN')}
+                                    ₫{(order.total + order.transportFee).toLocaleString('vi-VN')}
                                 </div>
                             </div>
 
-                            {order &&
-                                ((0 * 1 === 0 && (
-                                    <>
-                                        <button
-                                            onClick={() => handleChangeStatus(1)}
-                                            className={styles.payment_bottom_btn}
-                                        >
-                                            XÁC NHẬN
-                                        </button>
-                                        <button
-                                            onClick={() => handleChangeStatus(4)}
-                                            className={styles.abort_bottom_btn}
-                                        >
-                                            HỦY ĐƠN
-                                        </button>
-                                    </>
-                                )) ||
-                                    (0 * 1 === 1 && (
-                                        <button
-                                            onClick={() => handleChangeStatus(2)}
-                                            className={styles.payment_bottom_btn}
-                                        >
-                                            GIAO HÀNG
-                                        </button>
-                                    )))}
+                            {order?.status === 1 && (
+                                <>
+                                    <button onClick={() => handleChangeStatus(2)} className={styles.payment_bottom_btn}>
+                                        XÁC NHẬN
+                                    </button>
+                                    <button onClick={() => handleChangeStatus(5)} className={styles.abort_bottom_btn}>
+                                        HỦY ĐƠN
+                                    </button>
+                                </>
+                            )}
+
+                            {order?.status === 2 && (
+                                <button onClick={() => handleChangeStatus(3)} className={styles.payment_bottom_btn}>
+                                    GIAO HÀNG
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

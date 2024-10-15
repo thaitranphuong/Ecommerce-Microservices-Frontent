@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import addressSlice from '~/redux/slice/AddressSlice';
 import { notifyError } from '~/utils/notify';
 
-function AddressModal({ setModal, calculateShippingFee }: { setModal: any; calculateShippingFee: any }) {
+function AddressModal({ setModal }: { setModal: any }) {
     const [name, setName] = useState<any>('');
     const [phone, setPhone] = useState<any>('');
     const [cities, setCities] = useState<any>([]);
@@ -102,7 +102,6 @@ function AddressModal({ setModal, calculateShippingFee }: { setModal: any; calcu
                 street,
             }),
         );
-        calculateShippingFee();
         setModal(false);
     };
 

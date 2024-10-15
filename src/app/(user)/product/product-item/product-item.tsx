@@ -23,12 +23,13 @@ function ProductItem({ product, key }: { product: any; key: any }) {
                 <div className={styles.product_name}>{product.name}</div>
                 <div className={styles.product_price}>
                     <div className={styles.new_price}>
-                        {Math.round(product.price - (product.price * product.discountPercent) / 100).toLocaleString(
-                            'vi-VN',
-                        )}
+                        {product.price.toLocaleString('vi-VN')}
                         &nbsp;₫/<sub>{product?.unit}</sub>
                     </div>
-                    <div className={styles.old_price}>{Math.round(product.price).toLocaleString('vi-VN')}₫/</div>
+                    <div className={styles.old_price}>
+                        {Math.round(product.oldPrice).toLocaleString('vi-VN')}
+                        ₫/
+                    </div>
                     <sub>{product?.unit}</sub>
                 </div>
             </div>

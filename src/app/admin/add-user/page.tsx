@@ -27,6 +27,18 @@ function AddUser() {
     };
 
     const handleSave = async () => {
+        if (
+            !user?.email ||
+            !user?.password ||
+            !user?.name ||
+            !user?.phone ||
+            !user?.address ||
+            !user?.birthday ||
+            !user?.gender
+        ) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         user.gender == '0' ? (user.gender = false) : (user.gender = true);
         user.birthday = convertToISODate(user.birthday);
         setSavingModal(true);

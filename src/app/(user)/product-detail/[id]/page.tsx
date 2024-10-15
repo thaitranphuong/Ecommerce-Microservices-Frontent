@@ -31,6 +31,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     const [rate, setRate] = useState<any>();
     const [cartItem, setCartItem] = useState<any>({ userId: getUser().id, productId: params.id, quantity: 1 });
     const [savingModal, setSavingModal] = useState<boolean>(false);
+    const [user, setUser] = useState<any>(getUser());
 
     const id = params.id;
     const dispatch: any = useDispatch();
@@ -89,7 +90,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     useEffect(() => {
         render();
         getRate();
-        setComment({ userId: getUser().id, productId: id, star: 1 });
+        setComment({ userId: user.id, productId: id, star: 1 });
     }, []);
 
     useEffect(() => {
@@ -97,13 +98,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
     }, [page]);
 
     const handleLike = async (commentId: number) => {
-        if (!getUser()) return;
-        await api.getRequest(`/comment/like/${commentId}/${getUser().id}` + '');
+        if (!user) return;
+        await api.getRequest(`/comment/like/${commentId}/${user.id}` + '');
         getComments();
     };
 
     const handleUnLike = async (commentId: number) => {
-        await api.getRequest(`/comment/unlike/${commentId}/${getUser().id}` + '');
+        await api.getRequest(`/comment/unlike/${commentId}/${user.id}` + '');
         getComments();
     };
 
@@ -132,7 +133,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
     };
 
     const handleAddToCart = () => {
-        console.log(cartItem);
+        if (!user) {
+            notifyError('Bạn chưa đăng nhập!');
+            return;
+        }
         if (cartItem.quantity > 0) {
             dispatch(addToCart(cartItem));
             notify('Thêm vào giỏ hàng thành công', 'top-center');
@@ -161,7 +165,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
         if (!!comment.content) {
             await api.postRequest('/comment/create', comment);
             getComments();
-            setComment({ userId: getUser().id, productId: id, star: 1 });
+            setComment({ userId: user.id, productId: id, star: 1 });
             setImage(null);
             getRate();
             console.log(comment);
@@ -271,13 +275,12 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                         <div className={styles.product_right_price}>
                             <div className={styles.product_right_price_new}>
-                                {Math.round((product?.price * (100 - product?.discountPercent)) / 100).toLocaleString(
-                                    'vi-VN',
-                                )}
+                                {Math.round(product?.price).toLocaleString('vi-VN')}
                                 &nbsp;₫/<sub>{product?.unit}</sub>
                             </div>
                             <div className={styles.product_right_price_old}>
-                                {Math.round(product?.price).toLocaleString('vi-VN')}&nbsp;₫/<sub>{product?.unit}</sub>
+                                {Math.round(product?.oldPrice).toLocaleString('vi-VN')}&nbsp;₫/
+                                <sub>{product?.unit}</sub>
                             </div>
                             <div className={styles.product_right_price_discount}>{product?.discountPercent}% GIẢM</div>
                         </div>
@@ -466,71 +469,77 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                     </div>
                     <div className={styles.comment_box}>
-                        <div className={styles.comment_box_title}>Viết đánh giá</div>
-                        <textarea
-                            value={comment && comment.content ? comment.content : ''}
-                            onChange={handleChangeComment}
-                            className={styles.comment_box_input}
-                            placeholder="Viết đánh giá của bạn"
-                        ></textarea>
-                        <div id="image_container" className={styles.modal_upload_image}></div>
-                        <div className={styles.comment_box_action}>
-                            <div className={styles.comment_box_action_upload}>
-                                <span onClick={handleClickOnFileInput}>
-                                    <Icon path={mdiCamera} size={1.5} />
-                                </span>
-                                <input
-                                    onChange={handleChooseFile}
-                                    id="fileInput"
-                                    style={{ display: 'none' }}
-                                    type="file"
-                                />
-                            </div>
+                        {user && !user ? (
+                            <div className={styles.comment_box_title}>Hãy đăng nhập để có thể đánh giá sản phẩm</div>
+                        ) : (
+                            <>
+                                <div className={styles.comment_box_title}>Viết đánh giá</div>
+                                <textarea
+                                    value={comment && comment.content ? comment.content : ''}
+                                    onChange={handleChangeComment}
+                                    className={styles.comment_box_input}
+                                    placeholder="Viết đánh giá của bạn"
+                                ></textarea>
+                                <div id="image_container" className={styles.modal_upload_image}></div>
+                                <div className={styles.comment_box_action}>
+                                    <div className={styles.comment_box_action_upload}>
+                                        <span onClick={handleClickOnFileInput}>
+                                            <Icon path={mdiCamera} size={1.5} />
+                                        </span>
+                                        <input
+                                            onChange={handleChooseFile}
+                                            id="fileInput"
+                                            style={{ display: 'none' }}
+                                            type="file"
+                                        />
+                                    </div>
 
-                            <div className={styles.comment_box_action_start_list}>
-                                <Image
-                                    onClick={() => handleChooseStar(1)}
-                                    className={styles.comment_box_action_start_item}
-                                    src={star}
-                                    alt=""
-                                />
-                                <Image
-                                    onClick={() => handleChooseStar(2)}
-                                    className={styles.comment_box_action_start_item}
-                                    src={comment?.star >= 2 ? star : nonestar}
-                                    alt=""
-                                />
-                                <Image
-                                    onClick={() => handleChooseStar(3)}
-                                    className={styles.comment_box_action_start_item}
-                                    src={comment?.star >= 3 ? star : nonestar}
-                                    alt=""
-                                />
-                                <Image
-                                    onClick={() => handleChooseStar(4)}
-                                    className={styles.comment_box_action_start_item}
-                                    src={comment?.star >= 4 ? star : nonestar}
-                                    alt=""
-                                />
-                                <Image
-                                    onClick={() => handleChooseStar(5)}
-                                    className={styles.comment_box_action_start_item}
-                                    src={comment?.star >= 5 ? star : nonestar}
-                                    alt=""
-                                />
-                            </div>
-                            <button onClick={handleSaveComment} className={styles.comment_box_action_btn}>
-                                GỬI
-                            </button>
-                        </div>
-                        {image && (
-                            <Image
-                                src={URL.createObjectURL(image)}
-                                alt=""
-                                width={100}
-                                height={100}
-                                className="object-cover w-[100px] h-[100px]"
-                            />
+                                    <div className={styles.comment_box_action_start_list}>
+                                        <Image
+                                            onClick={() => handleChooseStar(1)}
+                                            className={styles.comment_box_action_start_item}
+                                            src={star}
+                                            alt=""
+                                        />
+                                        <Image
+                                            onClick={() => handleChooseStar(2)}
+                                            className={styles.comment_box_action_start_item}
+                                            src={comment?.star >= 2 ? star : nonestar}
+                                            alt=""
+                                        />
+                                        <Image
+                                            onClick={() => handleChooseStar(3)}
+                                            className={styles.comment_box_action_start_item}
+                                            src={comment?.star >= 3 ? star : nonestar}
+                                            alt=""
+                                        />
+                                        <Image
+                                            onClick={() => handleChooseStar(4)}
+                                            className={styles.comment_box_action_start_item}
+                                            src={comment?.star >= 4 ? star : nonestar}
+                                            alt=""
+                                        />
+                                        <Image
+                                            onClick={() => handleChooseStar(5)}
+                                            className={styles.comment_box_action_start_item}
+                                            src={comment?.star >= 5 ? star : nonestar}
+                                            alt=""
+                                        />
+                                    </div>
+                                    <button onClick={handleSaveComment} className={styles.comment_box_action_btn}>
+                                        GỬI
+                                    </button>
+                                </div>
+                                {image && (
+                                    <Image
+                                        src={URL.createObjectURL(image)}
+                                        alt=""
+                                        width={100}
+                                        height={100}
+                                        className="object-cover w-[100px] h-[100px]"
+                                    />
+                                )}
+                            </>
                         )}
                     </div>
                     <div className={styles.comment_list}>
@@ -577,7 +586,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                         )}
 
                                         <div className={styles.comment_item_body_like}>
-                                            {item.userLikedIds.includes(getUser().id) ? (
+                                            {item.userLikedIds.includes(user.id) ? (
                                                 <div onClick={() => handleUnLike(item.id)}>
                                                     <Icon
                                                         style={{ cursor: 'pointer', color: 'red' }}
@@ -598,7 +607,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                         </div>
                                     </div>
                                 </div>
-                                {getUser().isAdmin && (
+                                {user.isAdmin && (
                                     <button
                                         onClick={() => handleDeleteComment(item.id)}
                                         className="ml-[-40px] bg-red-600 text-white h-[30px] w-[40px] hover:bg-red-800 rounded-md"

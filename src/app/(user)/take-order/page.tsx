@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mdiCreditCardOutline, mdiMapMarker } from '@mdi/js';
 import Icon from '@mdi/react';
 import Image from 'next/image';
@@ -10,12 +10,15 @@ import AddressModal from '~/components/address-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { addressSelector, checkoutSelector, voucherSelector } from '~/redux/selectors';
+import { getUser } from '~/utils/localstorage';
+import { notifyError } from '~/utils/notify';
+import api from '~/utils/api';
 
 function TakeOrder() {
     const [voucherModal, setVoucherModal] = useState<boolean>(false);
     const [addressModal, setAddressModal] = useState<boolean>(false);
     const [note, setNote] = useState();
-    const [payment, setPayment] = useState();
+    const [payment, setPayment] = useState<any>('');
     const [shippingFee, setShippingFee] = useState(0);
 
     const dispatch = useDispatch();
@@ -74,6 +77,10 @@ function TakeOrder() {
         }
     };
 
+    useEffect(() => {
+        calculateShippingFee();
+    }, [address]);
+
     let total = voucher.discountPercent
         ? checkoutProducts.reduce((acc: any, item: any) => {
               return acc + item.quantity * item.price;
@@ -103,6 +110,60 @@ function TakeOrder() {
               ((voucher.discountPercent ?? 0) / 100)
             : voucher.maxDiscount
         : 0;
+
+    const handleCheckout = async () => {
+        if (!address.name) {
+            notifyError('Chưa chọn địa chỉ giao hàng');
+            return;
+        }
+        const order: any = {
+            id: 0,
+            customerName: address.name,
+            address:
+                address.street +
+                ', ' +
+                address.ward?.WardName +
+                ', ' +
+                address.district?.DistrictName +
+                ', ' +
+                address.city?.ProvinceName,
+            phoneNumber: address.phone,
+            status: 1,
+            paymentMethod: 0,
+            transportMethod: 'Giao hàng nhanh',
+            note: note,
+            voucherId: voucher.id ?? 0,
+            transportFee: shippingFee,
+            total: total,
+            userId: getUser().id,
+            orderDetails: [],
+        };
+        checkoutProducts.forEach((item: any) => {
+            order.orderDetails.push({
+                productId: item.productId,
+                quantity: item.quantity,
+            });
+        });
+        if (payment === 'COD') {
+            const result = await api.postRequest('/order/create', order);
+            if (result && result.statusCode === 200) {
+                localStorage.setItem('orderStatus', JSON.stringify(true));
+                window.location.pathname = '/auth/account/purchase';
+            }
+        } else if (payment === 'VNPAY') {
+            order.paymentMethod = 1;
+            localStorage.setItem('order', JSON.stringify(order));
+            //window.location.pathname = '/payment-vnpay';
+            alert('VNPAY');
+        } else if (payment === 'PAYPAL') {
+            order.paymentMethod = 2;
+            localStorage.setItem('order', JSON.stringify(order));
+            //window.location.pathname = '/payment-vnpay';
+            alert('PAYPAL');
+        } else {
+            notifyError('Chưa chọn phương thức thanh toán');
+        }
+    };
 
     return (
         <>
@@ -215,6 +276,8 @@ function TakeOrder() {
                                 <div className="flex items-center text-[16px]">
                                     Lời nhắn:
                                     <input
+                                        onChange={(e: any) => setNote(e.target.value)}
+                                        value={note}
                                         className="border-solid border-black border-[1px] ml-3 placeholder:text-sm px-2 py-1 w-[300px]"
                                         placeholder="Lưu ý cho người bán..."
                                     />
@@ -228,20 +291,26 @@ function TakeOrder() {
                             <div
                                 className={clsx(
                                     'relative w-[100px] h-[40px] border-solid border-[1px] border-gray-300 ml-5',
-                                    { ['payment-active']: true },
+                                    { ['payment-active']: payment === 'COD' },
                                 )}
                             >
-                                <button className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white">
+                                <button
+                                    onClick={() => setPayment('COD')}
+                                    className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
+                                >
                                     COD
                                 </button>
                             </div>
                             <div
                                 className={clsx(
                                     'relative w-[100px] h-[40px] border-solid border-[1px] border-gray-300 ml-5',
-                                    { ['payment-active']: false },
+                                    { ['payment-active']: payment === 'VNPAY' },
                                 )}
                             >
-                                <button className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white">
+                                <button
+                                    onClick={() => setPayment('VNPAY')}
+                                    className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
+                                >
                                     <Image
                                         src={require('~/../public/images/vnpay.png')}
                                         alt=""
@@ -253,10 +322,13 @@ function TakeOrder() {
                             <div
                                 className={clsx(
                                     'relative w-[100px] h-[40px] border-solid border-[1px] border-gray-300 ml-5',
-                                    { ['payment-active']: false },
+                                    { ['payment-active']: payment === 'PAYPAL' },
                                 )}
                             >
-                                <button className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white">
+                                <button
+                                    onClick={() => setPayment('PAYPAL')}
+                                    className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
+                                >
                                     <Image
                                         src={require('~/../public/images/paypal.png')}
                                         alt=""
@@ -295,7 +367,10 @@ function TakeOrder() {
                                         ₫{(total + shippingFee).toLocaleString('vi-VN')}
                                     </div>
                                 </div>
-                                <button className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700">
+                                <button
+                                    onClick={handleCheckout}
+                                    className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700"
+                                >
                                     ĐẶT HÀNG
                                 </button>
                             </div>
@@ -304,7 +379,7 @@ function TakeOrder() {
                 </div>
             </div>
             {voucherModal && <VoucherModal setModal={setVoucherModal} />}
-            {addressModal && <AddressModal setModal={setAddressModal} calculateShippingFee={calculateShippingFee} />}
+            {addressModal && <AddressModal setModal={setAddressModal} />}
         </>
     );
 }
