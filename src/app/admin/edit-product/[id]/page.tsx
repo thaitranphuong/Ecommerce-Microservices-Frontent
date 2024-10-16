@@ -72,6 +72,20 @@ export default function EditProduct({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
+        if (
+            !product?.name ||
+            !product?.categoryId ||
+            !product?.origin ||
+            !product?.price ||
+            !product?.unit ||
+            !product?.discountPercent ||
+            !product?.expiry ||
+            !product?.shortDescription ||
+            !product?.fullDescription
+        ) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         product.shortDescription += ' ';
         let json = JSON.stringify(product);
         let formData = new FormData();

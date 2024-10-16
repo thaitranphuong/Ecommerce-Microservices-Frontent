@@ -21,6 +21,10 @@ export default function AddSupplier() {
     };
 
     const handleSave = async () => {
+        if (!category?.name || !category?.phone || !category?.email || !category?.address) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         setSavingModal(true);
         const result = await api.postRequest('/supplier/create', category);
         setSavingModal(false);

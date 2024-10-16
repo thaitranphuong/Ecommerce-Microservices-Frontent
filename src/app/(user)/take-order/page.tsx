@@ -13,13 +13,14 @@ import { addressSelector, checkoutSelector, voucherSelector } from '~/redux/sele
 import { getUser } from '~/utils/localstorage';
 import { notifyError } from '~/utils/notify';
 import api from '~/utils/api';
+import PayPalButton from '~/components/paypal-button';
 
 function TakeOrder() {
     const [voucherModal, setVoucherModal] = useState<boolean>(false);
     const [addressModal, setAddressModal] = useState<boolean>(false);
     const [note, setNote] = useState();
     const [payment, setPayment] = useState<any>('');
-    const [shippingFee, setShippingFee] = useState(0);
+    const [shippingFee, setShippingFee] = useState(19999);
 
     const dispatch = useDispatch();
     const router = useRouter();
@@ -70,6 +71,7 @@ function TakeOrder() {
                 };
                 res = await fetch('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', params);
                 data = await res.json();
+                console.log(data);
                 if (data.code === 200) {
                     setShippingFee(data.data.service_fee);
                 }
@@ -112,10 +114,6 @@ function TakeOrder() {
         : 0;
 
     const handleCheckout = async () => {
-        if (!address.name) {
-            notifyError('Chưa chọn địa chỉ giao hàng');
-            return;
-        }
         const order: any = {
             id: 0,
             customerName: address.name,
@@ -142,9 +140,11 @@ function TakeOrder() {
             order.orderDetails.push({
                 productId: item.productId,
                 quantity: item.quantity,
+                price: item.price,
             });
         });
-        if (payment === 'COD') {
+        if (payment === 'COD' || payment === 'PAYPAL') {
+            if (payment === 'PAYPAL') order.paymentMethod = 2;
             const result = await api.postRequest('/order/create', order);
             if (result && result.statusCode === 200) {
                 localStorage.setItem('orderStatus', JSON.stringify(true));
@@ -155,14 +155,14 @@ function TakeOrder() {
             localStorage.setItem('order', JSON.stringify(order));
             //window.location.pathname = '/payment-vnpay';
             alert('VNPAY');
-        } else if (payment === 'PAYPAL') {
-            order.paymentMethod = 2;
-            localStorage.setItem('order', JSON.stringify(order));
-            //window.location.pathname = '/payment-vnpay';
-            alert('PAYPAL');
         } else {
             notifyError('Chưa chọn phương thức thanh toán');
         }
+    };
+
+    const handleChoosePaymentMethod = (method: string) => {
+        if (!address.name) notifyError('Chưa chọn địa chỉ giao hàng');
+        else setPayment(method);
     };
 
     return (
@@ -295,7 +295,7 @@ function TakeOrder() {
                                 )}
                             >
                                 <button
-                                    onClick={() => setPayment('COD')}
+                                    onClick={() => handleChoosePaymentMethod('COD')}
                                     className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
                                 >
                                     COD
@@ -308,7 +308,7 @@ function TakeOrder() {
                                 )}
                             >
                                 <button
-                                    onClick={() => setPayment('VNPAY')}
+                                    onClick={() => handleChoosePaymentMethod('VNPAY')}
                                     className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
                                 >
                                     <Image
@@ -326,7 +326,7 @@ function TakeOrder() {
                                 )}
                             >
                                 <button
-                                    onClick={() => setPayment('PAYPAL')}
+                                    onClick={() => handleChoosePaymentMethod('PAYPAL')}
                                     className="top-[2px] left-[3px] absolute w-[92px] h-[34px] bg-white"
                                 >
                                     <Image
@@ -367,12 +367,17 @@ function TakeOrder() {
                                         ₫{(total + shippingFee).toLocaleString('vi-VN')}
                                     </div>
                                 </div>
-                                <button
-                                    onClick={handleCheckout}
-                                    className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700"
-                                >
-                                    ĐẶT HÀNG
-                                </button>
+                                {payment === 'COD' && (
+                                    <button
+                                        onClick={handleCheckout}
+                                        className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700"
+                                    >
+                                        ĐẶT HÀNG
+                                    </button>
+                                )}
+                                {payment === 'PAYPAL' && (
+                                    <PayPalButton onSubmit={handleCheckout} value={total + shippingFee} />
+                                )}
                             </div>
                         </div>
                     </div>

@@ -46,6 +46,10 @@ export default function EditBlog({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
+        if (!blog?.title || !blog?.shortDescription || !blog?.content) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         let json = JSON.stringify(blog);
         const formData = new FormData();
         formData.append('blog', json);

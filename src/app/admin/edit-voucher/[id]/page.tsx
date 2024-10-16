@@ -33,6 +33,21 @@ export default function EditVoucher({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
+        if (
+            !voucher?.name ||
+            !voucher?.discountPercent ||
+            !voucher?.maxDiscount ||
+            !voucher?.quantity ||
+            !voucher?.startTime ||
+            !voucher?.endTime
+        ) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
+        if (voucher?.startTime > voucher?.endTime) {
+            notifyError('Ngày bắt đầu không được lớn hơn ngày kết thúc');
+            return;
+        }
         setSavingModal(true);
         voucher.startTime = convertToISODate(voucher.startTime);
         voucher.endTime = convertToISODate(voucher.endTime);

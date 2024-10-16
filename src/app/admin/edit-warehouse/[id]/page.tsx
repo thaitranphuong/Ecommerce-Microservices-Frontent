@@ -32,6 +32,10 @@ export default function EditWarehouse({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
+        if (!warehouse?.name || !warehouse?.address) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         setSavingModal(true);
         const result = await api.postRequest('/warehouse/create', warehouse);
         setSavingModal(false);

@@ -21,6 +21,10 @@ export default function AddCategory() {
     };
 
     const handleSave = async () => {
+        if (!category?.name || !category?.code) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         setSavingModal(true);
         const result = await api.postRequest('/category/create', category);
         setSavingModal(false);

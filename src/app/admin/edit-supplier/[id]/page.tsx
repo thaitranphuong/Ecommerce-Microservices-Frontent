@@ -32,6 +32,10 @@ export default function EditSupplier({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
+        if (!supplier?.name || !supplier?.phone || !supplier?.email || !supplier?.address) {
+            notifyError('Chưa nhập đầy đủ thông tin');
+            return;
+        }
         setSavingModal(true);
         const result = await api.postRequest('/supplier/create', supplier);
         setSavingModal(false);
