@@ -155,10 +155,11 @@ function Purchase() {
                             </div>
                             <div className={styles.item_bottom}>
                                 <div className={styles.item_bottom_price}>
-                                    <div className="absolute left-10 text-gray-500 text-sm">
+                                    <div className="absolute left-10 text-gray-500 text-sm max-w-[700px]">
+                                        {item.customerName} ({item.phoneNumber})<br></br>
                                         Ngày đặt: {convertFromISODateWithTime(item.createdTime)}
                                         <br></br>
-                                        Địa chỉ: ({item.phoneNumber}) {item.address}
+                                        Địa chỉ: {item.address}
                                     </div>
                                     <svg
                                         style={{ marginRight: '5px' }}

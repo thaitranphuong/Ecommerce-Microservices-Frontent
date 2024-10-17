@@ -22,16 +22,12 @@ function TakeOrder() {
     const [payment, setPayment] = useState<any>('');
     const [shippingFee, setShippingFee] = useState(19999);
 
-    const dispatch = useDispatch();
-    const router = useRouter();
-
     const voucher = useSelector(voucherSelector);
     const checkoutProducts = useSelector(checkoutSelector);
     const address = useSelector(addressSelector);
 
     const calculateShippingFee = async () => {
         if (!!address?.district?.DistrictID) {
-            console.log(1);
             let params = {
                 method: 'POST',
                 headers: {
@@ -71,7 +67,6 @@ function TakeOrder() {
                 };
                 res = await fetch('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', params);
                 data = await res.json();
-                console.log(data);
                 if (data.code === 200) {
                     setShippingFee(data.data.service_fee);
                 }
@@ -153,8 +148,9 @@ function TakeOrder() {
         } else if (payment === 'VNPAY') {
             order.paymentMethod = 1;
             localStorage.setItem('order', JSON.stringify(order));
-            //window.location.pathname = '/payment-vnpay';
-            alert('VNPAY');
+            const result = await api.getRequest(`/vnpay/create_payment?amount=${total + shippingFee}&locale=vn`);
+            if (result && result.statusCode === 200) window.location.href = result.data.url;
+            else alert('Lỗi');
         } else {
             notifyError('Chưa chọn phương thức thanh toán');
         }
@@ -367,7 +363,7 @@ function TakeOrder() {
                                         ₫{(total + shippingFee).toLocaleString('vi-VN')}
                                     </div>
                                 </div>
-                                {payment === 'COD' && (
+                                {(payment === 'COD' || payment === 'VNPAY') && (
                                     <button
                                         onClick={handleCheckout}
                                         className="h-[40px] w-[200px] bg-[var(--primary-color)] text-white rounded-md float-right hover:bg-green-700"
