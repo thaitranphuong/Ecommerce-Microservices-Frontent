@@ -1,0 +1,18 @@
+.wrapper {
+    min-height: calc(100vh - 72px * 2);
+    margin: 20px 50px;
+
+    table {
+        border: 1px solid #000;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #000;
+        text-align: center;
+        padding: 5px 5px 10px 5px;
+        font-size: 12px;
+    }
+}

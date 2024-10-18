@@ -271,7 +271,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                             </div>
                             <div className={styles.product_right_info_text}>{comments.length} Đánh giá</div>
 
-                            <div className={styles.product_right_info_text}>{product?.soldQuantity} Đã bán</div>
+                            <div className={styles.product_right_info_text}>
+                                Đã bán {product?.soldQuantity}
+                                {product?.unit}
+                            </div>
                         </div>
                         <div className={styles.product_right_price}>
                             <div className={styles.product_right_price_new}>
@@ -286,7 +289,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                         <div className={styles.product_right_shortdescription}>🗒️ {product?.shortDescription}</div>
                         <div className={styles.product_right_quantity}>
-                            <div className={styles.product_right_quantity_lablel}>Số lượng</div>
+                            <div className={styles.product_right_quantity_lablel}>Số lượng ({product?.unit})</div>
                             <button
                                 onClick={() => handleChangeQuantity(cartItem.quantity - 1)}
                                 className={styles.product_right_quantity_btn}
@@ -309,7 +312,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                 +
                             </button>
                             <div className={styles.product_right_quantity_text}>
-                                {product?.quantity} sản phẩm có sẵn
+                                {product?.quantity}
+                                {product?.unit} sản phẩm có sẵn
                             </div>
                         </div>
                         <div className={styles.product_right_btn}>

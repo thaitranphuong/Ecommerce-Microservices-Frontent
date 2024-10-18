@@ -20,7 +20,6 @@ export default function Blog() {
     const getProposedBlogs = async () => {
         let result = await api.getRequest(`/blog/get-all-order-by-views`);
         setProposedBlogs(result.data.listResult);
-        console.log(result);
     };
 
     const render = async () => {

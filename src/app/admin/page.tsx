@@ -17,16 +17,36 @@ import {
 import { Pie, Bar, Line } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import styles from './home.module.scss';
 import DateFilter from '~/components/date-filter/date-filter';
+import api from '~/utils/api';
 
 ChartJS.register(BarElement, LineElement, CategoryScale, LinearScale, PointElement, ArcElement, Tooltip, Legend);
 
 function Home() {
     const [selectedYear, setSelectedYear] = useState(new Date());
     const [selectedMonth, setSelectedMonth] = useState(new Date());
+    const [pendingOrdersInMonth, setPendingOrdersInMonth] = useState<any>();
+    const [blogs, setBlogs] = useState<any>();
+    const [users, setUsers] = useState<any>();
+    const [products, setProducts] = useState<any>();
+
+    const render = async () => {
+        let result = await api.getRequest(`/blog/get-all?page=1&limit=100&title=`);
+        if (result?.statusCode === 200) setBlogs(result.data.listResult);
+        result = await api.getRequest('/user/get-all?page=1&limit=100');
+        if (result?.statusCode === 200) setUsers(result.data.listResult);
+        result = await api.getRequest('/product/get-all?page=1&limit=100');
+        if (result?.statusCode === 200) setProducts(result.data.listResult);
+        result = await api.getRequest('/order/get-all?page=1&limit=100&status=1');
+        if (result?.statusCode === 200) setPendingOrdersInMonth(result.data.listResult);
+    };
+
+    useEffect(() => {
+        render();
+    }, []);
 
     const dataOrder = {
         labels: ['Chờ xác nhận', 'Đang chuẩn bị hàng', 'Đang giao hàng', 'Giao thành công', 'Hủy đơn'],
@@ -129,7 +149,7 @@ function Home() {
                 >
                     <div className={styles.card_top}>
                         <div className={styles.card_left}>
-                            <div className={styles.card_left_quantity}>10</div>
+                            <div className={styles.card_left_quantity}>{pendingOrdersInMonth?.length ?? 0}</div>
                             <div className={styles.card_title}>Đơn hàng</div>
                         </div>
                         <div style={{ backgroundColor: '#721ce9' }} className={styles.card_right}>
@@ -142,7 +162,7 @@ function Home() {
                     </div>
                 </Link>
                 <Link
-                    href="/admin/message"
+                    href="/admin/blog"
                     className={styles.card}
                     style={{
                         borderLeft: '5px solid #ffb300',
@@ -150,8 +170,8 @@ function Home() {
                 >
                     <div className={styles.card_top}>
                         <div className={styles.card_left}>
-                            <div className={styles.card_left_quantity}>8</div>
-                            <div className={styles.card_title}>Tin nhắn</div>
+                            <div className={styles.card_left_quantity}>{blogs?.length ?? 0}</div>
+                            <div className={styles.card_title}>Bài viết</div>
                         </div>
                         <div style={{ backgroundColor: '#ffb300' }} className={styles.card_right}>
                             <Icon path={mdiFacebookMessenger} size={2} />
@@ -171,7 +191,7 @@ function Home() {
                 >
                     <div className={styles.card_top}>
                         <div className={styles.card_left}>
-                            <div className={styles.card_left_quantity}>15</div>
+                            <div className={styles.card_left_quantity}>{users?.length ?? 0}</div>
                             <div className={styles.card_title}>Thành viên</div>
                         </div>
                         <div style={{ backgroundColor: '#9c27b0' }} className={styles.card_right}>
@@ -192,7 +212,7 @@ function Home() {
                 >
                     <div className={styles.card_top}>
                         <div className={styles.card_left}>
-                            <div className={styles.card_left_quantity}>20</div>
+                            <div className={styles.card_left_quantity}>{products?.length ?? 0}</div>
                             <div className={styles.card_title}>Sản phẩm</div>
                         </div>
                         <div style={{ backgroundColor: '#26a69a' }} className={styles.card_right}>

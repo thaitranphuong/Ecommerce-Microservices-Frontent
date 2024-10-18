@@ -11,6 +11,7 @@ import { convertFromISODateWithTime } from '~/utils/date-formatter';
 import { getUser } from '~/utils/localstorage';
 import { notifyError } from '~/utils/notify';
 
+let isView: boolean = false;
 export default function BlogDetail() {
     const [blog, setBlog] = useState<any>();
     const [comments, setComments] = useState<any>();
@@ -34,7 +35,6 @@ export default function BlogDetail() {
         if (result?.statusCode === 200) {
             setComments(result.data);
         }
-        console.log(result);
     };
 
     useEffect(() => {
@@ -43,7 +43,17 @@ export default function BlogDetail() {
         getBlog(id);
         getComments(id);
         setComment({ userId: getUser().id, blogId: id });
+        isView = true;
+
+        return () => {
+            isView = false;
+        };
     }, []);
+
+    if (isView) {
+        api.getRequest('/blog/update-view-number/' + id);
+        isView = false;
+    }
 
     const handleSubmit = async () => {
         if (!getUser()) {
@@ -72,9 +82,10 @@ export default function BlogDetail() {
                 <Image
                     src={blog?.thumbnail}
                     alt=""
-                    width={10000}
-                    height={10000}
+                    width={1000}
+                    height={1000}
                     className="w-full h-[400px] object-cover"
+                    priority
                 />
                 <div className="font-bold text-2xl font-sans mt-4">{blog?.title}</div>
                 <div className="mt-[20px] text-gray-500">
@@ -94,11 +105,11 @@ export default function BlogDetail() {
                 <div className="mt-24 py-11" style={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
                     <div className="font-semibold font-sans text-lg mb-8">{comments?.length} Bình luận</div>
                     {comments?.map((item: any) => (
-                        <div className="flex justify-start items-start mb-6">
+                        <div key={item.id} className="flex justify-start items-start mb-6">
                             <Image
                                 src={item.userAvatar ?? require('~/../public/images/avatar.png')}
-                                width={1000}
-                                height={1000}
+                                width={500}
+                                height={500}
                                 alt=""
                                 className="w-10 h-10 object-cover rounded-full"
                             />

@@ -26,13 +26,12 @@ function EditImport({ params }: { params: { id: string } }) {
             <Wrapper title="Quản lý nhập hàng" detail="Chi tiết phiếu nhập">
                 <div className="flex justify-between w-full">
                     <strong className="flex justify-between">
-                        <div>
-                            &nbsp;&nbsp;Mã phiếu nhập: {_import?.id} &nbsp;|&nbsp; Ngày nhập:{' '}
-                            {_import && convertFromISODateWithTime(_import.createdTime)} &nbsp;|&nbsp;{' '}
-                        </div>
-                        <div>Người nhập: {_import?.userName}</div>
+                        &nbsp;&nbsp;Mã phiếu nhập: {_import?.id} &nbsp;|&nbsp; Ngày nhập:{' '}
+                        {_import && convertFromISODateWithTime(_import?.createdTime)}
+                        &nbsp;|&nbsp; <div>{_import?.warehouseName}</div>
+                        &nbsp;|&nbsp; <div>Người nhập: {_import?.userName}</div>
                     </strong>
-                    <Pdf data={_import?.importDetails ?? [{ id: 0 }]} title="Phiết nhập hàng" />
+                    <Pdf importId={params.id} />
                 </div>
                 <table
                     style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
