@@ -10,24 +10,63 @@ import Wrapper from '~/components/layouts/admin/wrapper';
 import Image from 'next/image';
 import api from '~/utils/api';
 import Link from 'next/link';
+import Select from '~/components/select/select';
+import { notify, notifyError } from '~/utils/notify';
 
 function ViewOrder({ params }: { params: { id: string } }) {
     const [order, setOrder] = useState<any>({});
+    const [warehousesList, setWarehousesList] = useState<any>([]); // mảng chứa các mảng warehouse
+    const [orderDetails, setOrderDetails] = useState<any>([]);
 
     const render = async () => {
         let result = await api.getRequest(`/order/get/${params.id}`);
-        if (result?.statusCode === 200) setOrder(result.data);
+        if (result?.statusCode === 200) {
+            setOrder(result.data);
+            const order = result.data;
+            if (order.status === 1) {
+                order?.orderDetails.forEach(async (item: any) => {
+                    result = await api.getRequest(
+                        `/warehouse/get-all-to-export?productId=${item.productId}&productQuantity=${item.quantity}`,
+                    );
+                    warehousesList.push(result.data);
+                });
+                setWarehousesList((prev: any) => warehousesList);
+            }
+        }
     };
 
-    console.log(order);
+    const handleChooseWarehouse = (e: any, productId: number, orderId: number) => {
+        orderDetails.forEach((orderDetail: any, index: number) => {
+            if (orderDetail.productId === productId) orderDetails.splice(index, 1);
+        });
+        setOrderDetails((prev: any) => {
+            const _orderDetails = [...prev];
+            _orderDetails.push({
+                orderId,
+                productId,
+                warehouseId: e.target.value,
+            });
+            return _orderDetails;
+        });
+    };
+
+    console.log(orderDetails);
 
     useEffect(() => {
         render();
     }, []);
 
     const handleChangeStatus = async (status: number) => {
+        if (orderDetails.length < order.orderDetails.length) {
+            alert('Có sản phẩm chưa chọn kho hàng để xuất');
+            return;
+        }
+
         let result = await api.getRequest(`/order/update?id=${params.id}&status=${status}`);
-        if (result && result.statusCode === 200) render();
+        if (result && result.statusCode === 200) {
+            render();
+            await api.putRequest(`/order/update-order-details`, orderDetails);
+        }
     };
 
     return (
@@ -59,6 +98,10 @@ function ViewOrder({ params }: { params: { id: string } }) {
                                     <th>Giá</th>
                                     <th>Số lượng</th>
                                     <th>Tổng tiền</th>
+                                    <th>
+                                        {order.status === 1 && 'Chọn kho để xuất hàng'}
+                                        {order.status !== 1 && order.status !== 5 && 'Trạng thái'}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +124,26 @@ function ViewOrder({ params }: { params: { id: string } }) {
                                         </td>
                                         <td className={styles.total}>
                                             ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                        </td>
+                                        <td>
+                                            {order.status === 1 && (
+                                                <Select
+                                                    onChange={(e: any) =>
+                                                        handleChooseWarehouse(e, item.productId, item.orderId)
+                                                    }
+                                                    array={
+                                                        warehousesList.find((warehouses: any) => {
+                                                            if (warehouses.length === 0) return false;
+                                                            return (
+                                                                warehouses[0].inStockProducts[0].id === item.productId
+                                                            );
+                                                        }) ?? []
+                                                    }
+                                                    width={'100%'}
+                                                />
+                                            )}
+                                            {order.status === 2 && <i>Đang lấy hàng</i>}
+                                            {(order.status === 3 || order.status === 4) && <i>Đã xuất kho</i>}
                                         </td>
                                     </tr>
                                 ))}

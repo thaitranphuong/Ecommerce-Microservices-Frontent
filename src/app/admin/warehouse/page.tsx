@@ -1,7 +1,7 @@
 'use client';
 
 import Icon from '@mdi/react';
-import { mdiPen, mdiTrashCan } from '@mdi/js';
+import { mdiDeveloperBoard, mdiPen, mdiTrashCan } from '@mdi/js';
 
 import Wrapper from '~/components/layouts/admin/wrapper';
 import ExcelButton from '~/components/excel-button/excel-button';
@@ -89,6 +89,13 @@ function Warehouse() {
                                     <td>{item.address}</td>
                                     <td>
                                         <div className="flex justify-center items-center">
+                                            <Link
+                                                title="Xem chi tiết"
+                                                href={`/admin/view-warehouse/${item.id}`}
+                                                style={{ marginRight: '20px', color: 'orange', cursor: 'pointer' }}
+                                            >
+                                                <Icon path={mdiDeveloperBoard} size={2} />
+                                            </Link>
                                             <Link
                                                 href={`/admin/edit-warehouse/${item.id}`}
                                                 style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
