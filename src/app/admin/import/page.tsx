@@ -14,6 +14,7 @@ import api from '~/utils/api';
 import { convertFromISODateWithTime, convertToISODate, getCurrentDate } from '~/utils/date-formatter';
 import Input from '~/components/input/input';
 import Pdf from '~/components/pdf';
+import Skeleton from '~/components/skeleton/skeleton';
 
 function Import() {
     const [imports, setImports] = useState([]);
@@ -60,48 +61,57 @@ function Import() {
                     </div>
                     <div>
                         <AddButton to="/admin/add-import" />
-                        {/* <ExcelButton onClick={{}} /> */}
                     </div>
                 </div>
-                <table
-                    style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
-                >
-                    <thead>
-                        <tr>
-                            <th>Mã phiếu nhập</th>
-                            <th>Ngày nhập hàng</th>
-                            <th>Người nhập</th>
-                            <th>Nhà cung cấp</th>
-                            <th>Kho hàng</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {imports?.map((item: any, index: any) => (
-                            <tr key={item.id}>
-                                <td>{item.id}</td>
-                                <td>{convertFromISODateWithTime(item.createdTime)}</td>
-                                <td>{item.userName}</td>
-                                <td>{item.supplierName}</td>
-                                <td>{item.warehouseName}</td>
-                                <td>
-                                    <div className="flex justify-center items-center">
-                                        <Link
-                                            title="Xem chi tiết"
-                                            href={`/admin/edit-import/${item.id}`}
-                                            style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
-                                        >
-                                            <Icon path={mdiDeveloperBoard} size={2} />
-                                        </Link>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div style={{ width: '100%' }}>
-                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
-                </div>
+                {imports.length === 0 && <Skeleton />}
+                {imports.length > 0 && (
+                    <>
+                        <table
+                            style={{
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                margin: '20px 5px',
+                            }}
+                        >
+                            <thead>
+                                <tr>
+                                    <th>Mã phiếu nhập</th>
+                                    <th>Ngày nhập hàng</th>
+                                    <th>Người nhập</th>
+                                    <th>Nhà cung cấp</th>
+                                    <th>Kho hàng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {imports?.map((item: any, index: any) => (
+                                    <tr key={item.id}>
+                                        <td>{item.id}</td>
+                                        <td>{convertFromISODateWithTime(item.createdTime)}</td>
+                                        <td>{item.userName}</td>
+                                        <td>{item.supplierName}</td>
+                                        <td>{item.warehouseName}</td>
+                                        <td>
+                                            <div className="flex justify-center items-center">
+                                                <Link
+                                                    title="Xem chi tiết"
+                                                    href={`/admin/edit-import/${item.id}`}
+                                                    style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
+                                                >
+                                                    <Icon path={mdiDeveloperBoard} size={2} />
+                                                </Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div style={{ width: '100%' }}>
+                            <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+                        </div>
+                    </>
+                )}
             </Wrapper>
         </div>
     );

@@ -15,6 +15,7 @@ import Excel from '~/components/excel/excel';
 import ImageModal from '~/components/image-modal';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
+import Skeleton from '~/components/skeleton/skeleton';
 
 function Product() {
     const [products, setProducts] = useState([]);
@@ -73,68 +74,86 @@ function Product() {
                         <ExcelButton onClick={handleExportFile} />
                     </div>
                 </div>
-                <table
-                    style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
-                >
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Hình ảnh</th>
-                            <th>Danh mục</th>
-                            <th>Tồn kho</th>
-                            <th>Đã bán</th>
-                            <th>Giá</th>
-                            <th style={{ minWidth: '100px' }}>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products &&
-                            products.map((item: any, index: any) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1 + (page - 1) * 5}</td>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        <ImageModal style={{ height: '50px' }} imageUrl={item.thumbnail} />
-                                    </td>
-                                    <td>{item.categoryName}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{item.soldQuantity}</td>
-                                    <td>
-                                        {item.price.toLocaleString('vi-VN')} ₫/{item.unit}
-                                    </td>
-                                    <td>
-                                        <div className="flex justify-center items-center">
-                                            <Link
-                                                href={`/admin/edit-product/${item.id}`}
-                                                style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
-                                            >
-                                                <Icon path={mdiPen} size={1.5} />
-                                            </Link>
-                                            {item.enabled ? (
-                                                <span
-                                                    onClick={() => handleDelete(item.id, item.enabled)}
-                                                    style={{ color: 'green', cursor: 'pointer' }}
-                                                >
-                                                    <Icon path={mdiEye} size={1.5} />
-                                                </span>
-                                            ) : (
-                                                <span
-                                                    onClick={() => handleDelete(item.id, item.enabled)}
-                                                    style={{ color: 'red', cursor: 'pointer' }}
-                                                >
-                                                    <Icon path={mdiEyeOff} size={1.5} />
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
+                {products.length === 0 && <Skeleton />}
+                {products.length > 0 && (
+                    <>
+                        <table
+                            style={{
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                margin: '20px 5px',
+                            }}
+                        >
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Danh mục</th>
+                                    <th>Tồn kho</th>
+                                    <th>Đã bán</th>
+                                    <th>Giá</th>
+                                    <th style={{ minWidth: '100px' }}>Thao tác</th>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
-                <div style={{ width: '100%' }}>
-                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
-                </div>
+                            </thead>
+                            <tbody>
+                                {products &&
+                                    products.map((item: any, index: any) => (
+                                        <tr key={item.id}>
+                                            <td>{index + 1 + (page - 1) * 5}</td>
+                                            <td>{item.name}</td>
+                                            <td>
+                                                <ImageModal style={{ height: '50px' }} imageUrl={item.thumbnail} />
+                                            </td>
+                                            <td>{item.categoryName}</td>
+                                            <td>
+                                                {item.quantity} {item.unit}
+                                            </td>
+                                            <td>
+                                                {item.soldQuantity} {item.unit}
+                                            </td>
+                                            <td>
+                                                {item.price.toLocaleString('vi-VN')} ₫/{item.unit}
+                                            </td>
+                                            <td>
+                                                <div className="flex justify-center items-center">
+                                                    <Link
+                                                        href={`/admin/edit-product/${item.id}`}
+                                                        style={{
+                                                            marginRight: '20px',
+                                                            color: 'blue',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    >
+                                                        <Icon path={mdiPen} size={1.5} />
+                                                    </Link>
+                                                    {item.enabled ? (
+                                                        <span
+                                                            onClick={() => handleDelete(item.id, item.enabled)}
+                                                            style={{ color: 'green', cursor: 'pointer' }}
+                                                        >
+                                                            <Icon path={mdiEye} size={1.5} />
+                                                        </span>
+                                                    ) : (
+                                                        <span
+                                                            onClick={() => handleDelete(item.id, item.enabled)}
+                                                            style={{ color: 'red', cursor: 'pointer' }}
+                                                        >
+                                                            <Icon path={mdiEyeOff} size={1.5} />
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                        <div style={{ width: '100%' }}>
+                            <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+                        </div>
+                    </>
+                )}
             </Wrapper>
         </div>
     );

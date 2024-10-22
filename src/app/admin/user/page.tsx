@@ -17,6 +17,7 @@ import { notify, notifyError } from '~/utils/notify';
 import { User as _User } from '~/data/data-type';
 import { convertFromISODate } from '~/utils/date-formatter';
 import ImageModal from '~/components/image-modal';
+import Skeleton from '~/components/skeleton/skeleton';
 
 function User() {
     const [users, setUsers] = useState<_User[]>([]);
@@ -82,78 +83,92 @@ function User() {
                         <ExcelButton onClick={handleExportFile} />
                     </div>
                 </div>
-                <table
-                    style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
-                >
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Hình ảnh</th>
-                            <th>Email</th>
-                            <th>Họ và tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Ngày sinh</th>
-                            <th>Giới tính</th>
-                            <th>Quyền</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users &&
-                            users.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1 + (page - 1) * 5}</td>
-                                    <td>
-                                        <ImageModal
-                                            style={{ height: '50px', width: '50px', borderRadius: '50%' }}
-                                            imageUrl={item.avatar ? item.avatar : '/images/avatar.png'}
-                                        />
-                                    </td>
-                                    <td>{item.email}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.phone}</td>
-                                    <td>{convertFromISODate(item.birthDay)}</td>
-                                    <td>{item.gender === true ? 'Nam' : 'Nữ'}</td>
-                                    <td>
-                                        {item.roles.map((role: string, index: number) => (
-                                            <span key={role}>
-                                                {index > 0 && ', '}
-                                                {role}
-                                            </span>
-                                        ))}
-                                    </td>
-                                    <td>
-                                        <div className="flex justify-center items-center">
-                                            <Link
-                                                href={`/admin/edit-user/${item.id}`}
-                                                style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
-                                            >
-                                                <Icon path={mdiPen} size={1.5} />
-                                            </Link>
-                                            {item.enabled ? (
-                                                <span
-                                                    onClick={() => handleShowHide(item.id, item.enabled)}
-                                                    style={{ color: 'green', cursor: 'pointer' }}
-                                                >
-                                                    <Icon path={mdiEye} size={1.5} />
-                                                </span>
-                                            ) : (
-                                                <span
-                                                    onClick={() => handleShowHide(item.id, item.enabled)}
-                                                    style={{ color: 'red', cursor: 'pointer' }}
-                                                >
-                                                    <Icon path={mdiEyeOff} size={1.5} />
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
+                {users.length === 0 && <Skeleton />}
+                {users.length > 0 && (
+                    <>
+                        <table
+                            style={{
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                margin: '20px 5px',
+                            }}
+                        >
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Email</th>
+                                    <th>Họ và tên</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Ngày sinh</th>
+                                    <th>Giới tính</th>
+                                    <th>Quyền</th>
+                                    <th>Thao tác</th>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
-                <div style={{ width: '100%' }}>
-                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
-                </div>
+                            </thead>
+                            <tbody>
+                                {users &&
+                                    users.map((item, index) => (
+                                        <tr key={item.id}>
+                                            <td>{index + 1 + (page - 1) * 5}</td>
+                                            <td>
+                                                <ImageModal
+                                                    style={{ height: '50px', width: '50px', borderRadius: '50%' }}
+                                                    imageUrl={item.avatar ? item.avatar : '/images/avatar.png'}
+                                                />
+                                            </td>
+                                            <td>{item.email}</td>
+                                            <td>{item.name}</td>
+                                            <td>{item.phone}</td>
+                                            <td>{convertFromISODate(item.birthDay)}</td>
+                                            <td>{item.gender === true ? 'Nam' : 'Nữ'}</td>
+                                            <td>
+                                                {item.roles.map((role: string, index: number) => (
+                                                    <span key={role}>
+                                                        {index > 0 && ', '}
+                                                        {role}
+                                                    </span>
+                                                ))}
+                                            </td>
+                                            <td>
+                                                <div className="flex justify-center items-center">
+                                                    <Link
+                                                        href={`/admin/edit-user/${item.id}`}
+                                                        style={{
+                                                            marginRight: '20px',
+                                                            color: 'blue',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    >
+                                                        <Icon path={mdiPen} size={1.5} />
+                                                    </Link>
+                                                    {item.enabled ? (
+                                                        <span
+                                                            onClick={() => handleShowHide(item.id, item.enabled)}
+                                                            style={{ color: 'green', cursor: 'pointer' }}
+                                                        >
+                                                            <Icon path={mdiEye} size={1.5} />
+                                                        </span>
+                                                    ) : (
+                                                        <span
+                                                            onClick={() => handleShowHide(item.id, item.enabled)}
+                                                            style={{ color: 'red', cursor: 'pointer' }}
+                                                        >
+                                                            <Icon path={mdiEyeOff} size={1.5} />
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                        <div style={{ width: '100%' }}>
+                            <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+                        </div>
+                    </>
+                )}
             </Wrapper>
         </div>
     );

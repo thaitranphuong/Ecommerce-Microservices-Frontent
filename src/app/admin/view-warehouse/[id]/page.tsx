@@ -8,10 +8,13 @@ import ImageModal from '~/components/image-modal';
 
 function ViewWarehouse({ params }: { params: { id: string } }) {
     const [products, setProducts] = useState<any>();
+    const [warehouse, setWarehouse] = useState<any>();
 
     const render = async () => {
         let result = await api.getRequest(`/warehouse/get-all-in-stock/${params.id}`);
         setProducts(result.data);
+        result = await api.getRequest(`/warehouse/get/${params.id}`);
+        setWarehouse(result.data);
     };
 
     useEffect(() => {
@@ -21,6 +24,7 @@ function ViewWarehouse({ params }: { params: { id: string } }) {
     return (
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý kho hàng" detail="Sản phẩm tồn kho">
+                <div className="font-bold ml-[10px]">{warehouse?.name}</div>
                 <table
                     style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
                 >
@@ -37,7 +41,7 @@ function ViewWarehouse({ params }: { params: { id: string } }) {
                             <tr key={item.id}>
                                 <td>{index + 1}</td>
                                 <td>
-                                    <div className="flex justify-    items-center">
+                                    <div className="flex justify-items-center">
                                         <div className="ml-10 mr-10">
                                             <ImageModal imageUrl={item.thumbnail} />
                                         </div>

@@ -13,6 +13,7 @@ import { config } from '~/utils/config';
 import { convertFromISODateWithTime, convertToISODate, convertToISOWithTime } from '~/utils/date-formatter';
 import api from '~/utils/api';
 import ImageModal from '~/components/image-modal';
+import Skeleton from '~/components/skeleton/skeleton';
 
 let connection: any = null;
 let connected = false;
@@ -192,9 +193,10 @@ function Message() {
             <div className={styles.wrapper}>
                 <div className={styles.left}>
                     <div className={styles.search_bar}>
-                        <input className={styles.search_input} placeholder="Tìm tên admin" />
+                        <input className={styles.search_input} disabled placeholder="" />
                     </div>
                     <div className={styles.user_list}>
+                        {listAdmins?.length === 0 && <Skeleton />}
                         {listAdmins.map((item: any) => (
                             <div
                                 key={item.id}

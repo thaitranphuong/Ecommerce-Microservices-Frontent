@@ -22,6 +22,15 @@ import { useEffect, useState } from 'react';
 import styles from './home.module.scss';
 import DateFilter from '~/components/date-filter/date-filter';
 import api from '~/utils/api';
+import {
+    convertFromISODate,
+    convertFromISODateWithTimeToStatistic,
+    convertToISODate,
+    convertToISOWithTime,
+    getDayFromISO,
+    getMonthFromISO,
+    getYearFromISO,
+} from '~/utils/date-formatter';
 
 ChartJS.register(BarElement, LineElement, CategoryScale, LinearScale, PointElement, ArcElement, Tooltip, Legend);
 
@@ -32,6 +41,10 @@ function Home() {
     const [blogs, setBlogs] = useState<any>();
     const [users, setUsers] = useState<any>();
     const [products, setProducts] = useState<any>();
+    const [orderPie, setOrderPie] = useState<any>([]);
+    const [orderMonth, setOrderMonth] = useState<any>([]);
+    const [orderMonthLabel, setOrderMonthLabel] = useState<any>([]);
+    const [orderYear, setOrderYear] = useState<any>([]);
 
     const render = async () => {
         let result = await api.getRequest(`/blog/get-all?page=1&limit=100&title=`);
@@ -52,7 +65,7 @@ function Home() {
         labels: ['Chờ xác nhận', 'Đang chuẩn bị hàng', 'Đang giao hàng', 'Giao thành công', 'Hủy đơn'],
         datasets: [
             {
-                data: [3, 6, 9, 12, 15],
+                data: orderPie,
                 backgroundColor: ['aqua', '#ff63ff', '#7cff7c', '#26a69a', '#6d6dff'],
             },
         ],
@@ -76,7 +89,7 @@ function Home() {
         datasets: [
             {
                 label: 'Doanh thu',
-                data: [1000, 2000, 1000, 3000, 4000, 5000, 1000, 6000, 3000, 7000, 5000, 1000],
+                data: orderYear,
                 backgroundColor: '#6d6dff',
                 fill: true,
                 tension: 0.4,
@@ -85,43 +98,11 @@ function Home() {
     };
 
     const dataRevenueMonth = {
-        labels: [
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-            '10',
-            '11',
-            '12',
-            '13',
-            '14',
-            '15',
-            '16',
-            '17',
-            '18',
-            '19',
-            '20',
-            '21',
-            '22',
-            '23',
-            '24',
-            '25',
-            '26',
-            '27',
-            '28',
-            '29',
-            '30',
-            '31',
-        ],
+        labels: orderMonthLabel,
         datasets: [
             {
                 label: 'Doanh thu',
-                data: [1, 2, 1, 3, 4, 5, 1, 6, 3, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                data: orderMonth,
                 backgroundColor: '#26a69a',
                 fill: true,
                 tension: 0.4,
@@ -133,6 +114,105 @@ function Home() {
         plugins: {
             legend: true,
         },
+    };
+
+    const getDate = async (selectedDate: any, endDate: any, orderType: any) => {
+        let result: any = [];
+        if (orderType === 'day') {
+            result = await api.getRequest(
+                `/order/find-all-by-date-to-statistic?startDate=${convertToISOWithTime(
+                    convertFromISODateWithTimeToStatistic(selectedDate),
+                )}&endDate=${convertToISODate(convertFromISODate(endDate))}`,
+            );
+        } else if (orderType === 'month')
+            result = await api.getRequest(
+                `/order/find-all-by-month-to-statistic?month=${getMonthFromISO(selectedDate)}&year=${getYearFromISO(
+                    selectedDate,
+                )}`,
+            );
+        else result = await api.getRequest(`/order/find-all-by-year-to-statistic?year=${getYearFromISO(selectedDate)}`);
+        if (result?.statusCode === 200) {
+            const data = [0, 0, 0, 0, 0];
+            result.data.forEach((order: any) => {
+                data[order.status - 1] += 1;
+            });
+            setOrderPie([...data]);
+        }
+    };
+
+    const handleRevenueStatistic = async (selectedDate: any, orderType: any) => {
+        let result: any = [];
+        if (orderType === 'month') {
+            result = await api.getRequest(
+                `/order/find-all-by-month-to-statistic?month=${getMonthFromISO(selectedDate)}&year=${getYearFromISO(
+                    selectedDate,
+                )}`,
+            );
+            if (result?.statusCode === 200) {
+                let data = [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                ];
+                let labels = [
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9',
+                    '10',
+                    '11',
+                    '12',
+                    '13',
+                    '14',
+                    '15',
+                    '16',
+                    '17',
+                    '18',
+                    '19',
+                    '20',
+                    '21',
+                    '22',
+                    '23',
+                    '24',
+                    '25',
+                    '26',
+                    '27',
+                    '28',
+                    '29',
+                    '30',
+                    '31',
+                ];
+                result.data.forEach((order: any) => {
+                    const day = getDayFromISO(order.createdTime);
+                    data[parseInt(day) - 1] += order.total;
+                });
+                if ([4, 6, 9, 11].includes(parseInt(getMonthFromISO(selectedDate)))) {
+                    data.splice(30, 1);
+                    labels.splice(30, 1);
+                }
+                if (getMonthFromISO(selectedDate) === '2') {
+                    data.splice(29, 2);
+                    labels.splice(29, 2);
+                }
+                setOrderMonth([...data]);
+                setOrderMonthLabel([...labels]);
+                setSelectedMonth(selectedDate);
+            }
+        } else {
+            result = await api.getRequest(`/order/find-all-by-year-to-statistic?year=${getYearFromISO(selectedDate)}`);
+            if (result?.statusCode === 200) {
+                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                result.data.forEach((order: any) => {
+                    const month = getMonthFromISO(order.createdTime);
+                    data[parseInt(month) - 1] += order.total;
+                });
+                setOrderYear([...data]);
+                setSelectedYear(selectedDate);
+            }
+        }
     };
 
     return (
@@ -229,7 +309,7 @@ function Home() {
             <div className={styles.chart_wrapper}>
                 <div className={styles.order}>
                     <div className={styles.chart_title}>THỐNG KÊ ĐƠN HÀNG</div>
-                    <DateFilter />
+                    <DateFilter getDate={getDate} />
                     <Pie data={dataOrder} options={options}></Pie>
                 </div>
 
@@ -239,7 +319,7 @@ function Home() {
                     <DatePicker
                         className={styles.picker_input}
                         selected={selectedMonth}
-                        onChange={(date: any) => setSelectedMonth(date)}
+                        onChange={(date: any) => handleRevenueStatistic(date, 'month')}
                         showMonthYearPicker
                         dateFormat="MM/yyyy"
                     />
@@ -252,7 +332,7 @@ function Home() {
                 <DatePicker
                     className={styles.picker_input}
                     selected={selectedYear}
-                    onChange={(date: any) => setSelectedYear(date)}
+                    onChange={(date: any) => handleRevenueStatistic(date, 'year')}
                     showYearPicker
                     dateFormat="yyyy"
                 />

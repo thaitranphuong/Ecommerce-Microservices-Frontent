@@ -15,6 +15,7 @@ import Excel from '~/components/excel/excel';
 import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
 import { convertFromISODate } from '~/utils/date-formatter';
+import Skeleton from '~/components/skeleton/skeleton';
 
 function Voucher() {
     const [vouchers, setVouchers] = useState([]);
@@ -71,57 +72,71 @@ function Voucher() {
                         <ExcelButton onClick={handleExportFile} />
                     </div>
                 </div>
-                <table
-                    style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
-                >
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Mã voucher</th>
-                            <th>Chỉ số giảm</th>
-                            <th>Giảm tối đa</th>
-                            <th>Số lượng</th>
-                            <th>Còn lại</th>
-                            <th>Ngày bắt đầu</th>
-                            <th>Ngày kết thúc</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {vouchers &&
-                            vouchers.map((item: any, index: any) => (
+                {vouchers.length === 0 && <Skeleton />}
+                {vouchers.length > 0 && (
+                    <>
+                        <table
+                            style={{
+                                border: '1px solid #ccc',
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                margin: '20px 5px',
+                            }}
+                        >
+                            <thead>
                                 <tr>
-                                    <td>{index + 1 + (page - 1) * 5}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.discountPercent}%</td>
-                                    <td>{item.maxDiscount.toLocaleString('vi-VN')} đ</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{item.quantity - item.usedQuantity}</td>
-                                    <td>{convertFromISODate(item.startTime)}</td>
-                                    <td>{convertFromISODate(item.endTime)}</td>
-                                    <td>
-                                        <div className="flex justify-center items-center">
-                                            <Link
-                                                href={`/admin/edit-voucher/${item.id}`}
-                                                style={{ marginRight: '20px', color: 'blue', cursor: 'pointer' }}
-                                            >
-                                                <Icon path={mdiPen} size={1.5} />
-                                            </Link>
-                                            <span
-                                                onClick={() => handleDelete(item.id)}
-                                                style={{ color: 'red', cursor: 'pointer' }}
-                                            >
-                                                <Icon path={mdiTrashCan} size={1.5} />
-                                            </span>
-                                        </div>
-                                    </td>
+                                    <th>STT</th>
+                                    <th>Mã voucher</th>
+                                    <th>Chỉ số giảm</th>
+                                    <th>Giảm tối đa</th>
+                                    <th>Số lượng</th>
+                                    <th>Còn lại</th>
+                                    <th>Ngày bắt đầu</th>
+                                    <th>Ngày kết thúc</th>
+                                    <th>Thao tác</th>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
-                <div style={{ width: '100%' }}>
-                    <Pagination page={page} setPage={setPage} totalPage={totalPage} />
-                </div>
+                            </thead>
+                            <tbody>
+                                {vouchers &&
+                                    vouchers.map((item: any, index: any) => (
+                                        <tr>
+                                            <td>{index + 1 + (page - 1) * 5}</td>
+                                            <td>{item.name}</td>
+                                            <td>{item.discountPercent}%</td>
+                                            <td>{item.maxDiscount.toLocaleString('vi-VN')} đ</td>
+                                            <td>{item.quantity}</td>
+                                            <td>{item.quantity - item.usedQuantity}</td>
+                                            <td>{convertFromISODate(item.startTime)}</td>
+                                            <td>{convertFromISODate(item.endTime)}</td>
+                                            <td>
+                                                <div className="flex justify-center items-center">
+                                                    <Link
+                                                        href={`/admin/edit-voucher/${item.id}`}
+                                                        style={{
+                                                            marginRight: '20px',
+                                                            color: 'blue',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    >
+                                                        <Icon path={mdiPen} size={1.5} />
+                                                    </Link>
+                                                    <span
+                                                        onClick={() => handleDelete(item.id)}
+                                                        style={{ color: 'red', cursor: 'pointer' }}
+                                                    >
+                                                        <Icon path={mdiTrashCan} size={1.5} />
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                        <div style={{ width: '100%' }}>
+                            <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+                        </div>
+                    </>
+                )}
             </Wrapper>
         </div>
     );

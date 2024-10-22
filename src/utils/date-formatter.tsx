@@ -24,6 +24,18 @@ function convertFromISODateWithTime(isoString: string) {
     return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 }
 
+function convertFromISODateWithTimeToStatistic(isoString: string) {
+    const date = new Date(isoString);
+    date.setUTCHours(23, 59, 59, 0);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const seconds = ('0' + date.getSeconds()).slice(-2);
+    return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+}
+
 function convertToISODate(dateString: string) {
     // Chuyển chuỗi 'yyyy-MM-dd' thành đối tượng Date
     const date = new Date(dateString);
@@ -49,11 +61,33 @@ function getCurrentDate() {
     return `${year}-${month}-${day}`;
 }
 
+function getDayFromISO(isoString: string) {
+    const date = new Date(isoString);
+    const day = ('0' + date.getDate()).slice(-2);
+    return day;
+}
+
+function getMonthFromISO(isoString: string) {
+    const date = new Date(isoString);
+    const month = ('' + (date.getMonth() + 1)).slice(-2);
+    return month;
+}
+
+function getYearFromISO(isoString: string) {
+    const date = new Date(isoString);
+    const year = date.getFullYear() + '';
+    return year;
+}
+
 export {
     convertFromISODate,
     convertFromISODateWithTime,
+    convertFromISODateWithTimeToStatistic,
     convertToISODate,
     convertFromISODateExcludeYear,
     getCurrentDate,
     convertToISOWithTime,
+    getDayFromISO,
+    getMonthFromISO,
+    getYearFromISO,
 };
