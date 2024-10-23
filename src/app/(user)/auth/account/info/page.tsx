@@ -22,6 +22,7 @@ export default function Info() {
             ...user,
             [e.target.name]: e.target.value,
         });
+        console.log(e.target.value);
     };
     const handleUpload = () => {
         const input: any = document.getElementById('input-upload');
@@ -50,12 +51,16 @@ export default function Info() {
             formData.append('image', image);
             let result: any = await api.uploadFileRequest('/user/upload-avatar', formData);
             if (result && result.statusCode === 200) {
-                notify('Cập nhật ảnh đại diện thành công');
+                //notify('Cập nhật ảnh đại diện thành công');
                 user.avatar = result.data.path;
             }
         }
+        !user.phone ? (user.phone = '-') : 1;
+        !user.address ? (user.address = '-') : 1;
         user.gender == 'false' ? (user.gender = false) : (user.gender = true);
+        user.birthDay === '0001-01-01T00:00:00' ? (user.birthDay = '2000-01-01') : 1;
         user.birthDay = convertToISODate(user.birthDay);
+        console.log(user.birthDay);
         result = await api.putRequest('/user/update', user);
         if (result && result.statusCode === 200 && result.id !== null) {
             result = await api.getRequest('/user/get/' + user.id);

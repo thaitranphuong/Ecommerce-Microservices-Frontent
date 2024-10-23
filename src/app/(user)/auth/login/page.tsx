@@ -10,6 +10,7 @@ import api from '~/utils/api';
 import { notify, notifyError } from '~/utils/notify';
 import SavingModal from '~/components/saving-modal';
 import { getUser } from '~/utils/localstorage';
+import GoogleLoginButton from '~/components/google-login-button';
 
 type User = {
     name: string;
@@ -34,6 +35,7 @@ function Login() {
         password: '',
     });
     const [processing, setProcessing] = useState(false);
+    const [registerSuccessModal, setRegisterSuccessModal] = useState(false);
 
     useEffect(() => {
         if (!!getUser()) {
@@ -123,10 +125,13 @@ function Login() {
             if (result && result.statusCode === 200) {
                 if (result.data.user.id === null) notifyError('Email đã tồn tại');
                 else {
-                    notify('Đăng ký thành công');
-                    localStorage.setItem('user', JSON.stringify(result.data.user));
-                    localStorage.setItem('token', JSON.stringify(result.data.token));
-                    window.location.pathname = '/home';
+                    setRegisterSuccessModal(true);
+                    setUserRegister({
+                        name: '',
+                        email: '',
+                        phone: '',
+                        password: '',
+                    });
                 }
             } else {
                 notifyError('Đăng ký thất bại');
@@ -140,10 +145,14 @@ function Login() {
         localStorage.clear();
         const result = await api.postRequest('/auth/login', userLogin);
         if (result && result.statusCode === 200) {
-            localStorage.setItem('user', JSON.stringify(result.data.user));
-            localStorage.setItem('token', JSON.stringify(result.data.token));
-            if (result.data.user.roles.includes('admin')) window.location.pathname = '/home';
-            else window.location.pathname = '/home';
+            if (result.data.user.id === '-1') {
+                notifyError('Tài khoản chưa được kích hoạt hoặc bị vô hiệu hóa');
+            } else {
+                localStorage.setItem('user', JSON.stringify(result.data.user));
+                localStorage.setItem('token', JSON.stringify(result.data.token));
+                if (result.data.user.roles.includes('admin')) window.location.pathname = '/home';
+                else window.location.pathname = '/home';
+            }
         } else {
             notifyError('Sai email hoặc mật khẩu');
         }
@@ -152,6 +161,7 @@ function Login() {
 
     return (
         <>
+            {registerSuccessModal && <RegisterSuccessModal setModal={setRegisterSuccessModal} />}
             {processing && <SavingModal text="Đang xử lý " />}
             <div className={styles.wrapper}>
                 <div className={styles.full}>
@@ -209,16 +219,7 @@ function Login() {
                             </button>
                         </div>
                         <div className={styles.login}>
-                            <div className={styles.auth0}>
-                                <Image
-                                    className={styles.auth0_btn}
-                                    alt=""
-                                    width={100}
-                                    height={100}
-                                    src={require('~/../public/images/google_logo.png')}
-                                />
-                                Đăng nhập với Google
-                            </div>
+                            <GoogleLoginButton />
                             <input
                                 onChange={handleInputLoginChange}
                                 value={userLogin?.email}

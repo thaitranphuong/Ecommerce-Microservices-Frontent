@@ -57,9 +57,11 @@ function ViewOrder({ params }: { params: { id: string } }) {
     }, []);
 
     const handleChangeStatus = async (status: number) => {
-        if (orderDetails.length < order.orderDetails.length) {
-            alert('Có sản phẩm chưa chọn kho hàng để xuất');
-            return;
+        if (status === 2) {
+            if (orderDetails.length < order.orderDetails.length) {
+                alert('Có sản phẩm chưa chọn kho hàng để xuất');
+                return;
+            }
         }
 
         let result = await api.getRequest(`/order/update?id=${params.id}&status=${status}`);

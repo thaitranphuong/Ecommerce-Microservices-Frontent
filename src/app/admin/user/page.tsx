@@ -18,12 +18,14 @@ import { User as _User } from '~/data/data-type';
 import { convertFromISODate } from '~/utils/date-formatter';
 import ImageModal from '~/components/image-modal';
 import Skeleton from '~/components/skeleton/skeleton';
+import SavingModal from '~/components/saving-modal';
 
 function User() {
     const [users, setUsers] = useState<_User[]>([]);
     const [totalPage, setTotalpage] = useState(1);
     const [page, setPage] = useState(1);
     const [email, setEmail] = useState('');
+    const [savingModal, setSavingModal] = useState<boolean>(false);
 
     const render = async () => {
         let result = await api.getRequest(`/user/get-all?page=${page}&limit=5&email=${email}`);
@@ -42,8 +44,9 @@ function User() {
     }, [email]);
 
     const handleShowHide = async (id: any, enabled: boolean) => {
+        setSavingModal(true);
         let result = await api.getRequest(`/user/showhide/${id}`);
-        console.log(result);
+        setSavingModal(false);
         if (result && result.statusCode === 200) {
             render();
             if (enabled) notify('Vô hiệu hóa tài khoản thành công');
@@ -71,6 +74,7 @@ function User() {
 
     return (
         <div className={styles.wrapper}>
+            {savingModal && <SavingModal />}
             <Wrapper title="Quản lý người dùng" detail="Danh sách người dùng">
                 <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <SearchBar
