@@ -122,7 +122,7 @@ function ProductList() {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 h-[1000px]">
+                <div className="flex-1 h-[1300px] md:h-[2700px] sm:h-[2700px]">
                     <div className="flex justify-start items-center flex-wrap">
                         {products?.map((item: any) => (
                             <ProductItem key={item.id} product={item} />

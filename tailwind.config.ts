@@ -13,7 +13,7 @@ const config: Config = {
                 foreground: 'var(--foreground)',
             },
             screens: {
-                md: { min: '740px', max: '1023px' },
+                md: { min: '740px', max: '1172px' },
                 sm: { max: '739px' },
             },
             keyframes: {

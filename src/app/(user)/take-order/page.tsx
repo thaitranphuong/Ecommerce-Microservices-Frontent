@@ -216,11 +216,17 @@ function TakeOrder() {
                                         className="font-bold"
                                         style={{ borderBottom: '2px solid var(--primary-color)' }}
                                     >
-                                        <td>Sản phẩm</td>
+                                        <td>
+                                            <div className="min-w-[100px]">Sản phẩm</div>
+                                        </td>
                                         <td></td>
                                         <td>Giá</td>
-                                        <td>Số lượng</td>
-                                        <td>Tổng tiền</td>
+                                        <td>
+                                            <div className="min-w-[100px]">Số lượng</div>
+                                        </td>
+                                        <td>
+                                            <div className="min-w-[100px]">Tổng tiền</div>
+                                        </td>
                                     </tr>
                                     {checkoutProducts?.map((item: any) => (
                                         <tr style={{ borderBottom: '1px solid #ccc' }}>
@@ -234,7 +240,9 @@ function TakeOrder() {
                                                 />
                                             </td>
                                             <td>
-                                                <div className="max-w-[600px] min-w-[500px]">{item.name}</div>
+                                                <div className="max-w-[600px] min-w-[500px] md:min-w-0 sm:min-w-0 webkit md:mr-5 sm:mr-5 md:ml-5 sm:ml-5">
+                                                    {item.name}
+                                                </div>
                                             </td>
                                             <td>
                                                 <div className="ml-[-20px] font-semibold">
@@ -265,10 +273,13 @@ function TakeOrder() {
                             </div>
                             <div className="w-full h-[2px] bg-gray-400"></div>
                             <div className="flex justify-between items-center mt-4 text-lg">
-                                <button onClick={() => setVoucherModal(true)} className="text-red-500">
+                                <button
+                                    onClick={() => setVoucherModal(true)}
+                                    className="text-red-500 sm:hidden md:hidden"
+                                >
                                     🏷️ Chọn voucher
                                 </button>
-                                <div className="text-red-500">Mã voucher: {voucher?.name}</div>
+                                <div className="text-red-500 sm:hidden md:hidden">Mã voucher: {voucher?.name}</div>
                                 <div className="flex items-center text-[16px]">
                                     Lời nhắn:
                                     <input

@@ -69,12 +69,18 @@ export default function Cart() {
                     <tbody style={{ padding: '20px' }}>
                         <tr className="font-bold" style={{ borderBottom: '2px solid var(--primary-color)' }}>
                             <td></td>
-                            <td>Sản phẩm</td>
+                            <td>
+                                <div className="min-w-[80px]">Sản phẩm</div>
+                            </td>
                             <td></td>
                             <td>Giá</td>
                             <td>Số lượng</td>
-                            <td>Tổng tiền</td>
-                            <td>Thao tác</td>
+                            <td>
+                                <div className="md:ml-9 min-w-[100px] sm:hidden">Tổng tiền</div>
+                            </td>
+                            <td>
+                                <div className="min-w-[100px]">Thao tác</div>
+                            </td>
                         </tr>
                         {cartItems?.map((item: any) => (
                             <tr style={{ borderBottom: '1px solid #ccc' }}>
@@ -93,16 +99,18 @@ export default function Cart() {
                                     <Image
                                         src={item.thumbnail}
                                         alt=""
-                                        height={10000}
-                                        width={10000}
-                                        className="w-20 h-20 object-cover mt-4 mb-4 border-solid border-[#ddd] border-[1px]"
+                                        height={500}
+                                        width={500}
+                                        className="w-20 h-20 md:h-14 md:w-14 sm:h-10 sm:w-10 object-cover mt-4 mb-4 border-solid border-[#ddd] border-[1px]"
                                     />
                                 </td>
                                 <td>
-                                    <div className="max-w-[600px] min-w-[500px]">{item.name}</div>
+                                    <div className="webkit max-w-[600px] min-w-[500px] md:min-w-[1px] sm:min-w-[1px] md:mr-10 sm:mr-10 sm:ml[-20px]">
+                                        {item.name}
+                                    </div>
                                 </td>
                                 <td>
-                                    <div className="ml-[-20px] font-semibold mr-[10px]">
+                                    <div className="ml-[-20px] font-semibold mr-[10px] min-w-[100px]">
                                         {item.price.toLocaleString('vi-VN')} ₫/<sub>{item.unit}</sub>
                                     </div>
                                 </td>
@@ -128,8 +136,10 @@ export default function Cart() {
                                         </button>
                                     </div>
                                 </td>
-                                <td className="primary-color font-semibold">
-                                    ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                <td className="primary-color font-semibold ">
+                                    <div className="md:ml-9 sm:hidden">
+                                        ₫{(item.price * item.quantity).toLocaleString('vi-VN')}
+                                    </div>
                                 </td>
                                 <td>
                                     <div onClick={() => handleDeleteCartItem(item)}>
@@ -145,12 +155,14 @@ export default function Cart() {
                         ))}
                     </tbody>
                 </table>
-                <div className="flex justify-between items-center mt-10 text-lg">
-                    <button onClick={() => setModal(true)} className="text-red-500">
-                        🏷️ Chọn voucher
-                    </button>
-                    <div className="text-red-500">Mã voucher: {voucher.name}</div>
-                    <div className="flex items-center">
+                <div className="flex justify-between items-center mt-10 text-lg sm:text-sm flex-wrap">
+                    <div className="flex justify-start items-center flex-1 min-w-[430px] sm:mb-9 md:mb-9">
+                        <button onClick={() => setModal(true)} className="text-red-500">
+                            🏷️ Chọn voucher
+                        </button>
+                        <div className="text-red-500 ml-10">Mã voucher: {voucher.name}</div>
+                    </div>
+                    <div className="flex">
                         Tổng thanh toán ({checkoutProducts.length} Sản phẩm):{' '}
                         <span className="primary-color text-2xl font-bold ml-2 mr-2">
                             ₫
@@ -174,7 +186,7 @@ export default function Cart() {
                         </span>
                         <div
                             onClick={handleOrder}
-                            className="w-[200px] h-[40px] flex justify-center items-center bg-[var(--primary-color)] ml-2 rounded-md text-white hover:bg-green-800 text-[17px] cursor-pointer"
+                            className="w-[200px] h-[40px] sm:w-[100px] sm:h-[30px] sm:text-sm flex justify-center items-center bg-[var(--primary-color)] ml-2 rounded-md text-white hover:bg-green-800 text-[17px] cursor-pointer"
                         >
                             MUA HÀNG
                         </div>

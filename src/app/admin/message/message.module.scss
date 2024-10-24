@@ -69,6 +69,11 @@
                         .info_name {
                             color: var(--text-color);
                             font-size: 14px;
+                            line-height: 20px;
+                            overflow: hidden;
+                            -webkit-box-orient: vertical;
+                            -webkit-line-clamp: 1;
+                            display: -webkit-box;
                         }
 
                         .info_time {
@@ -214,5 +219,11 @@
                 transform: scale(0.9);
             }
         }
+    }
+}
+
+@media only screen and (max-width: 1400px) {
+    .info_time {
+        display: none;
     }
 }

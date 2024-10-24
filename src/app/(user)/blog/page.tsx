@@ -49,6 +49,17 @@ export default function Blog() {
                 currentPage="Tin tức"
                 link="/blog"
             />
+            <div className="hidden md:flex md:mr-6 md:mt-10 md:ml-5 sm:flex sm:mr-6 sm:mt-10 sm:ml-5">
+                <input
+                    onChange={(e: any) => setTitle(e.target.value)}
+                    value={title}
+                    className="flex-1 border-[1px] border-solid border-gray-300 px-2 py-5 rounded-sm placeholder:text-gray-500 placeholder:text-lg"
+                    placeholder="Tìm bài viết theo tiêu đề"
+                />
+                <button className="flex justify-center items-center px-5 bg-slate-200">
+                    <Icon path={mdiMagnify} size={1} />
+                </button>
+            </div>
             <div className="flex justify-center items-start max-w-[1305px] m-auto px-5 flex-wrap mt-28">
                 <div className="flex-1">
                     {blogs?.map((item: any) => (
@@ -92,7 +103,7 @@ export default function Blog() {
 
                     <Pagination page={page} setPage={setPage} totalPage={totalPage} />
                 </div>
-                <div className="h-10 w-[415px] ml-5">
+                <div className="h-10 w-[415px] ml-5 md:hidden sm:hidden">
                     <div className="flex mr-6">
                         <input
                             onChange={(e: any) => setTitle(e.target.value)}
