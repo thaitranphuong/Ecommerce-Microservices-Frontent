@@ -145,8 +145,7 @@ function Purchase() {
                                                     </div>
                                                 </div>
                                                 <div className={styles.item_top_body_info_quantity}>
-                                                    Số lượng: {detail.quantity}
-                                                    {detail.unit}
+                                                    Số lượng: {detail.quantity} {detail.unit}
                                                 </div>
                                             </div>
                                         </div>

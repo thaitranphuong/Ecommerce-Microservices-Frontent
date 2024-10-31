@@ -36,15 +36,7 @@ function EditUser({ params }: { params: { id: string } }) {
     };
 
     const handleSave = async () => {
-        if (
-            !user?.email ||
-            !user?.password ||
-            !user?.name ||
-            !user?.phone ||
-            !user?.address ||
-            !user?.birthday ||
-            !user?.gender
-        ) {
+        if (!user?.name || !user?.phone || !user?.address || !user?.birthDay) {
             notifyError('Chưa nhập đầy đủ thông tin');
             return;
         }

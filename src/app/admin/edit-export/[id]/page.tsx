@@ -2,19 +2,18 @@
 import { useEffect, useState } from 'react';
 
 import Wrapper from '~/components/layouts/admin/wrapper';
-import styles from './edit-import.module.scss';
+import styles from './edit-export.module.scss';
 import api from '~/utils/api';
 import { convertFromISODateWithTime } from '~/utils/date-formatter';
 import ImageModal from '~/components/image-modal';
 import Pdf from '~/components/pdf';
 
-function EditImport({ params }: { params: { id: string } }) {
-    const [_import, setImport] = useState<any>();
+function EditExport({ params }: { params: { id: string } }) {
+    const [_export, setExport] = useState<any>();
 
     const render = async () => {
-        let result = await api.getRequest(`/import/get/${params.id}`);
-        setImport(result.data);
-        console.log(result);
+        let result = await api.getRequest(`/export/get/${params.id}`);
+        setExport(result.data);
     };
 
     useEffect(() => {
@@ -23,25 +22,15 @@ function EditImport({ params }: { params: { id: string } }) {
 
     return (
         <div className={styles.wrapper}>
-            <Wrapper title="Quản lý nhập hàng" detail="Chi tiết phiếu nhập">
+            <Wrapper title="Quản lý xuất hàng" detail="Chi tiết phiếu xuất">
                 <div className="flex justify-between w-full">
-                    <div className="flex justify-between">
-                        &nbsp;&nbsp;Mã phiếu nhập:&nbsp;<strong>{_import?.id}</strong> &nbsp;|&nbsp; Ngày nhập:&nbsp;
-                        <strong>{_import && convertFromISODateWithTime(_import?.createdTime)}</strong>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Kho:&nbsp;<strong>{_import?.warehouseName}</strong>
-                        </div>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Người nhập:&nbsp;<strong>{_import?.userName}</strong>
-                        </div>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Nhà cung cấp:&nbsp;<strong>{_import?.supplierName}</strong>
-                        </div>
-                    </div>
-                    <Pdf id={params.id} isExport={true} />
+                    <strong className="flex justify-between">
+                        &nbsp;&nbsp;Mã phiếu xuất: {_export?.id} &nbsp;|&nbsp; Ngày xuất:{' '}
+                        {_export && convertFromISODateWithTime(_export?.createdTime)}
+                        &nbsp;|&nbsp; <div>{_export?.warehouseName}</div>
+                        &nbsp;|&nbsp; <div>Người xuất: {_export?.userName}</div>
+                    </strong>
+                    <Pdf id={params.id} isExport={false} />
                 </div>
                 <table
                     style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}
@@ -55,7 +44,7 @@ function EditImport({ params }: { params: { id: string } }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {_import?.importDetails?.map((item: any, index: number) => (
+                        {_export?.exportDetails?.map((item: any, index: number) => (
                             <tr key={item.id}>
                                 <td>{index + 1}</td>
                                 <td>
@@ -79,8 +68,8 @@ function EditImport({ params }: { params: { id: string } }) {
                 </table>
                 <strong className="text-green-700 ml-2">
                     Tổng tiền:{' '}
-                    {_import?.importDetails &&
-                        _import.importDetails
+                    {_export?.exportDetails &&
+                        _export.exportDetails
                             .reduce((acc: any, item: any) => (acc += +item.price * +item.quantity), 0)
                             .toLocaleString('vn-VN')}{' '}
                     ₫
@@ -90,4 +79,4 @@ function EditImport({ params }: { params: { id: string } }) {
     );
 }
 
-export default EditImport;
+export default EditExport;

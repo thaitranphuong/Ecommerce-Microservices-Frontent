@@ -20,6 +20,7 @@ export default function AddProduct() {
     const [image, setImage] = useState<any>(null);
     const [detailImages, setDetailImages] = useState<any>([]);
     const [categories, setCategories] = useState([]);
+    const [units, setUnits] = useState([]);
     const [savingModal, setSavingModal] = useState<boolean>(false);
     const router = useRouter();
 
@@ -28,8 +29,14 @@ export default function AddProduct() {
         if (result.statusCode === 200) setCategories(result.data.listResult);
     };
 
+    const getUnits = async () => {
+        let result = await api.getRequest(`/unit/get-all?page=1&limit=50`);
+        if (result.statusCode === 200) setUnits(result.data.listResult);
+    };
+
     useEffect(() => {
         getCategories();
+        getUnits();
     }, []);
 
     const handleOnchange = (e: any) => {
@@ -66,7 +73,7 @@ export default function AddProduct() {
             !product?.categoryId ||
             !product?.origin ||
             !product?.price ||
-            !product?.unit ||
+            !product?.unitId ||
             !product?.discountPercent ||
             !product?.expiry ||
             !product?.shortDescription ||
@@ -132,7 +139,7 @@ export default function AddProduct() {
                 <Select onChange={handleOnchange} label="Danh mục" array={categories} name="categoryId" />
                 <Input onChange={handleOnchange} label="Xuất xứ" name="origin" />
                 <Input onChange={handleOnchange} label="Giá (VNĐ)" width="25%" name="price" type={'number'} />
-                <Input onChange={handleOnchange} label="Đơn vị tính (kg, gam,...)" width="25%" name="unit" />
+                <Select onChange={handleOnchange} width="25%" label="Đơn vị tính" array={units} name="unitId" />
                 <Input
                     onChange={handleOnchange}
                     label="Giảm giá (%)"

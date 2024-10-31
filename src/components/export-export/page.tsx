@@ -1,16 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-import styles from './export-import.module.scss';
+import styles from './export-export.module.scss';
 import api from '~/utils/api';
 import { convertFromISODateWithTime } from '~/utils/date-formatter';
 
-function ExportImport({ params }: { params: { id: string } }) {
-    const [_import, setImport] = useState<any>();
+function ExportExport({ params }: { params: { id: string } }) {
+    const [_export, setExport] = useState<any>();
 
     const render = async () => {
-        let result = await api.getRequest(`/import/get/${params.id}`);
-        setImport(result.data);
+        let result = await api.getRequest(`/export/get/${params.id}`);
+        setExport(result.data);
         console.log(result);
     };
 
@@ -21,26 +21,29 @@ function ExportImport({ params }: { params: { id: string } }) {
     return (
         <div className={styles.wrapper}>
             <div className="flex justify-between w-full">
-                <div className="text-[8px]">
+                <div className="text-[12px]">
                     <div className="font-bold">FRUITABLE SHOP</div>
                     <div className="font-sans">Địa chỉ: Thốt Nốt, Cần Thơ</div>
                     <div className="font-sans">Điện thoại: 01.3331212</div>
                     <div className="font-semibold">Hotline: 0121 313 121</div>
                 </div>
                 <div className="text-center">
-                    <div className="text-4xl font-bold mb-3">Phiếu nhập kho</div>
-                    <div className="text-[8px]">
-                        Ngày nhập: {_import && convertFromISODateWithTime(_import.createdTime)}
+                    <div className="text-4xl font-bold mb-3">Phiếu xuất kho</div>
+                    <div className="text-xl">
+                        Ngày xuất: {_export && convertFromISODateWithTime(_export.createdTime)}
                     </div>
                 </div>
                 <div className="text-2xl ">
-                    Số: <span className="text-red-500">{_import?.id}</span>
+                    Số: <span className="text-red-500">{_export?.id}</span>
                 </div>
             </div>
-            <div className="mt-10 text-[10px] flex justify-between items-center">
-                <div>Nhà cung cấp: {_import?.supplierName}</div>
-                <div>Nhập tại kho: {_import?.warehouseName}</div>
-                <div>Người nhập: {_import?.userName}</div>
+            <div className="mt-10 text-[12px] flex justify-between items-center">
+                <div>Người nhận: {_export?.receiverName}</div>
+                <div>Người xuất: {_export?.userName}</div>
+            </div>
+            <div className="mt-2 text-[12px] flex justify-between items-center">
+                <div>Xuất từ kho: {_export?.warehouseName}</div>
+                <div>Lý do: {_export?.reason}</div>
             </div>
             <table style={{ border: '1px solid #ccc', width: '100%', borderCollapse: 'collapse', margin: '20px 5px' }}>
                 <thead>
@@ -54,7 +57,7 @@ function ExportImport({ params }: { params: { id: string } }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {_import?.importDetails?.map((item: any, index: number) => (
+                    {_export?.exportDetails?.map((item: any, index: number) => (
                         <tr key={item.id}>
                             <td>{index + 1}</td>
                             <td>{item.productName}</td>
@@ -69,8 +72,8 @@ function ExportImport({ params }: { params: { id: string } }) {
             <div className="text-[12px] mt-[-20px]">
                 <strong>
                     Tổng tiền:{' '}
-                    {_import?.importDetails &&
-                        _import.importDetails
+                    {_export?.exportDetails &&
+                        _export.exportDetails
                             .reduce((acc: any, item: any) => (acc += +item.price * +item.quantity), 0)
                             .toLocaleString('vn-VN')}{' '}
                     ₫
@@ -80,4 +83,4 @@ function ExportImport({ params }: { params: { id: string } }) {
     );
 }
 
-export default ExportImport;
+export default ExportExport;

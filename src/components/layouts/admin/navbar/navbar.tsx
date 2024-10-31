@@ -6,6 +6,7 @@ import styles from './navbar.module.scss';
 import Icon from '@mdi/react';
 import {
     mdiAccountMultiple,
+    mdiApplicationExport,
     mdiApplicationImport,
     mdiBagPersonalTag,
     mdiHanger,
@@ -16,6 +17,7 @@ import {
     mdiTextBox,
     mdiViewDashboard,
     mdiWarehouse,
+    mdiWeightKilogram,
 } from '@mdi/js';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -46,7 +48,11 @@ function NavBar({ showNav }: { showNav: any }) {
                 className={clsx(styles.item, { [styles.active]: pathName.includes('product') })}
             >
                 <Icon className={styles.icon} path={mdiHanger} size={1.2} />
-                <div className={styles.label}>Quản lý sản phẩm </div>
+                <div className={styles.label}>Quản lý sản phẩm</div>
+            </Link>
+            <Link href="/admin/unit" className={clsx(styles.item, { [styles.active]: pathName.includes('unit') })}>
+                <Icon className={styles.icon} path={mdiWeightKilogram} size={1.2} />
+                <div className={styles.label}>Quản lý đơn vị tính</div>
             </Link>
             <Link href="/admin/blog" className={clsx(styles.item, { [styles.active]: pathName.includes('blog') })}>
                 <Icon className={styles.icon} path={mdiPost} size={1.2} />
@@ -76,6 +82,10 @@ function NavBar({ showNav }: { showNav: any }) {
             <Link href="/admin/import" className={clsx(styles.item, { [styles.active]: pathName.includes('import') })}>
                 <Icon className={styles.icon} path={mdiApplicationImport} size={1.2} />
                 <div className={styles.label}>Quản lý nhập hàng</div>
+            </Link>
+            <Link href="/admin/export" className={clsx(styles.item, { [styles.active]: pathName.includes('export') })}>
+                <Icon className={styles.icon} path={mdiApplicationExport} size={1.2} />
+                <div className={styles.label}>Quản lý xuất hàng</div>
             </Link>
             <Link href="/admin/order" className={clsx(styles.item, { [styles.active]: pathName.includes('order') })}>
                 <Icon className={styles.icon} path={mdiTextBox} size={1.2} />

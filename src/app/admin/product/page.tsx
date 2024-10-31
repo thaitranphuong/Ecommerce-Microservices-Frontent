@@ -93,7 +93,7 @@ function Product() {
                                     <th>Danh mục</th>
                                     <th>Tồn kho</th>
                                     <th>Đã bán</th>
-                                    <th>Giá</th>
+                                    <th>Giá gốc</th>
                                     <th style={{ minWidth: '100px' }}>Thao tác</th>
                                 </tr>
                             </thead>
@@ -114,7 +114,7 @@ function Product() {
                                                 {item.soldQuantity} {item.unit}
                                             </td>
                                             <td>
-                                                {item.price.toLocaleString('vi-VN')} ₫/{item.unit}
+                                                {item.oldPrice.toLocaleString('vi-VN')} ₫/{item.unit}
                                             </td>
                                             <td>
                                                 <div className="flex justify-center items-center">

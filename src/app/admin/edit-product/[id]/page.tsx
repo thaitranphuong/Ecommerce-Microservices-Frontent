@@ -21,14 +21,15 @@ export default function EditProduct({ params }: { params: { id: string } }) {
     const [image, setImage] = useState<any>(null);
     const [detailImages, setDetailImages] = useState<any>([]);
     const [categories, setCategories] = useState([]);
+    const [units, setUnits] = useState([]);
     const [deletedImages, setDeletedImages] = useState<any>([]);
     const [savingModal, setSavingModal] = useState<boolean>(false);
     const router = useRouter();
 
     const render = async () => {
         let result = await api.getRequest(`/product/get/${params.id}`);
+        result.data.price = (result.data.price * 100) / (100 - result.data.discountPercent);
         setProduct(result.data);
-        console.log(result);
     };
 
     const getCategories = async () => {
@@ -36,8 +37,14 @@ export default function EditProduct({ params }: { params: { id: string } }) {
         if (result.statusCode === 200) setCategories(result.data.listResult);
     };
 
+    const getUnits = async () => {
+        let result = await api.getRequest(`/unit/get-all?page=1&limit=50`);
+        if (result.statusCode === 200) setUnits(result.data.listResult);
+    };
+
     useEffect(() => {
         getCategories();
+        getUnits();
         render();
     }, []);
 
@@ -77,7 +84,7 @@ export default function EditProduct({ params }: { params: { id: string } }) {
             !product?.categoryId ||
             !product?.origin ||
             !product?.price ||
-            !product?.unit ||
+            !product?.unitId ||
             !product?.discountPercent ||
             !product?.expiry ||
             !product?.shortDescription ||
@@ -177,13 +184,21 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                     name="categoryId"
                 />
                 <Input value={product?.origin} onChange={handleOnchange} label="Xuất xứ" name="origin" />
-                <Input value={product?.price} onChange={handleOnchange} label="Giá (VNĐ)" width="25%" name="price" />
                 <Input
-                    value={product?.unit}
+                    value={product?.price}
                     onChange={handleOnchange}
-                    label="Đơn vị tính (kg, gam,...)"
+                    label="Giá (VNĐ)"
                     width="25%"
-                    name="unit"
+                    name="price"
+                    type="number"
+                />
+                <Select
+                    value={product?.unitId}
+                    onChange={handleOnchange}
+                    width="25%"
+                    label="Đơn vị tính"
+                    array={units}
+                    name="unitId"
                 />
                 <Input
                     onChange={handleOnchange}

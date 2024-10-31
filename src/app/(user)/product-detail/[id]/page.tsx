@@ -32,6 +32,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
     const [cartItem, setCartItem] = useState<any>({ userId: getUser().id, productId: params.id, quantity: 1 });
     const [savingModal, setSavingModal] = useState<boolean>(false);
     const [user, setUser] = useState<any>(getUser());
+    const [orders, setOrders] = useState<any>([]);
+    const [isPuchased, setIsPuchased] = useState<boolean>(false);
+    const [isCommented, setIsCommented] = useState<boolean>(false);
+    const [isHydrate, setIsHydrate] = useState<boolean>(false);
 
     const id = params.id;
     const dispatch: any = useDispatch();
@@ -48,11 +52,38 @@ function ProductDetail({ params }: { params: { id: string } }) {
         }
     };
 
+    const getOrders = async () => {
+        setIsHydrate(false);
+        const result = await api.getRequest(`/order/get-all-of-customer-page?status=0&userId=${user.id}`);
+        if (result && result.statusCode === 200) setOrders(result.data);
+        console.log(result.data);
+        result.data.forEach((order: any) => {
+            order.orderDetails.forEach((orderDetail: any) => {
+                if (orderDetail.productId == params.id) setIsPuchased(true);
+            });
+        });
+        setIsHydrate(true);
+    };
+
     const getComments = async () => {
         let result = await api.getRequest(`/comment/get-all/${id}?page=${page}&limit=5`);
-        setTotalpage(result.data.totalPage);
-        setPage(result.data.page);
-        setComments(result.data.listResult);
+        if (result.statusCode === 200) {
+            setTotalpage(result.data.totalPage);
+            setPage(result.data.page);
+            setComments(result.data.listResult);
+        }
+    };
+
+    const getAllComments = async () => {
+        setIsHydrate(false);
+        let result = await api.getRequest(`/comment/get-all/${id}?page=1&limit=100`);
+        console.log(result);
+        if (result.statusCode === 200) {
+            result.data.listResult.forEach((item: any) => {
+                if (item.userId === user.id) setIsCommented(true);
+            });
+        }
+        setIsHydrate(true);
     };
 
     const getRate = async () => {
@@ -90,6 +121,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
     useEffect(() => {
         render();
         getRate();
+        getOrders();
+        getAllComments();
         setComment({ userId: user.id, productId: id, star: 1 });
     }, []);
 
@@ -165,10 +198,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
         if (!!comment.content) {
             await api.postRequest('/comment/create', comment);
             getComments();
+            getAllComments();
             setComment({ userId: user.id, productId: id, star: 1 });
             setImage(null);
             getRate();
-            console.log(comment);
         }
         setSavingModal(false);
     };
@@ -312,8 +345,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                                 +
                             </button>
                             <div className={styles.product_right_quantity_text}>
-                                {product?.quantity}
-                                {product?.unit} sản phẩm có sẵn
+                                {product?.quantity} {product?.unit} sản phẩm có sẵn
                             </div>
                         </div>
                         <div className={styles.product_right_btn}>
@@ -380,7 +412,11 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                         <div className={styles.comment_left_total}>({rate?.commentQuantity} đánh giá)</div>
                     </div>
-                    <div className={styles.comment_right}>
+                    <div
+                        className={clsx('md:hidden sm:hidden', {
+                            [styles.comment_right]: true,
+                        })}
+                    >
                         <div className={styles.comment_right_item}>
                             <div className={styles.comment_right_item_left}>
                                 <Image className={styles.comment_right_item_left_start} src={star} alt="" />
@@ -473,78 +509,93 @@ function ProductDetail({ params }: { params: { id: string } }) {
                         </div>
                     </div>
                     <div className={styles.comment_box}>
-                        {user && !user ? (
-                            <div className={styles.comment_box_title}>Hãy đăng nhập để có thể đánh giá sản phẩm</div>
-                        ) : (
-                            <>
-                                <div className={styles.comment_box_title}>Viết đánh giá</div>
-                                <textarea
-                                    value={comment && comment.content ? comment.content : ''}
-                                    onChange={handleChangeComment}
-                                    className={styles.comment_box_input}
-                                    placeholder="Viết đánh giá của bạn"
-                                ></textarea>
-                                <div id="image_container" className={styles.modal_upload_image}></div>
-                                <div className={styles.comment_box_action}>
-                                    <div className={styles.comment_box_action_upload}>
-                                        <span onClick={handleClickOnFileInput}>
-                                            <Icon path={mdiCamera} size={1.5} />
-                                        </span>
-                                        <input
-                                            onChange={handleChooseFile}
-                                            id="fileInput"
-                                            style={{ display: 'none' }}
-                                            type="file"
-                                        />
-                                    </div>
-
-                                    <div className={styles.comment_box_action_start_list}>
-                                        <Image
-                                            onClick={() => handleChooseStar(1)}
-                                            className={styles.comment_box_action_start_item}
-                                            src={star}
-                                            alt=""
-                                        />
-                                        <Image
-                                            onClick={() => handleChooseStar(2)}
-                                            className={styles.comment_box_action_start_item}
-                                            src={comment?.star >= 2 ? star : nonestar}
-                                            alt=""
-                                        />
-                                        <Image
-                                            onClick={() => handleChooseStar(3)}
-                                            className={styles.comment_box_action_start_item}
-                                            src={comment?.star >= 3 ? star : nonestar}
-                                            alt=""
-                                        />
-                                        <Image
-                                            onClick={() => handleChooseStar(4)}
-                                            className={styles.comment_box_action_start_item}
-                                            src={comment?.star >= 4 ? star : nonestar}
-                                            alt=""
-                                        />
-                                        <Image
-                                            onClick={() => handleChooseStar(5)}
-                                            className={styles.comment_box_action_start_item}
-                                            src={comment?.star >= 5 ? star : nonestar}
-                                            alt=""
-                                        />
-                                    </div>
-                                    <button onClick={handleSaveComment} className={styles.comment_box_action_btn}>
-                                        GỬI
-                                    </button>
+                        {user &&
+                            isHydrate &&
+                            (!user ? (
+                                <div className={styles.comment_box_title}>
+                                    Hãy đăng nhập để có thể đánh giá sản phẩm
                                 </div>
-                                {image && (
-                                    <Image
-                                        src={URL.createObjectURL(image)}
-                                        alt=""
-                                        width={100}
-                                        height={100}
-                                        className="object-cover w-[100px] h-[100px]"
-                                    />
-                                )}
-                            </>
-                        )}
+                            ) : isPuchased ? (
+                                isCommented ? (
+                                    <div className={styles.comment_box_title}>
+                                        Bạn đã đánh giá sản phẩm. Chỉ được đánh giá một lần
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={styles.comment_box_title}>Viết đánh giá</div>
+                                        <textarea
+                                            value={comment && comment.content ? comment.content : ''}
+                                            onChange={handleChangeComment}
+                                            className={styles.comment_box_input}
+                                            placeholder="Viết đánh giá của bạn"
+                                        ></textarea>
+                                        <div id="image_container" className={styles.modal_upload_image}></div>
+                                        <div className={styles.comment_box_action}>
+                                            <div className={styles.comment_box_action_upload}>
+                                                <span onClick={handleClickOnFileInput}>
+                                                    <Icon path={mdiCamera} size={1.5} />
+                                                </span>
+                                                <input
+                                                    onChange={handleChooseFile}
+                                                    id="fileInput"
+                                                    style={{ display: 'none' }}
+                                                    type="file"
+                                                />
+                                            </div>
+
+                                            <div className={styles.comment_box_action_start_list}>
+                                                <Image
+                                                    onClick={() => handleChooseStar(1)}
+                                                    className={styles.comment_box_action_start_item}
+                                                    src={star}
+                                                    alt=""
+                                                />
+                                                <Image
+                                                    onClick={() => handleChooseStar(2)}
+                                                    className={styles.comment_box_action_start_item}
+                                                    src={comment?.star >= 2 ? star : nonestar}
+                                                    alt=""
+                                                />
+                                                <Image
+                                                    onClick={() => handleChooseStar(3)}
+                                                    className={styles.comment_box_action_start_item}
+                                                    src={comment?.star >= 3 ? star : nonestar}
+                                                    alt=""
+                                                />
+                                                <Image
+                                                    onClick={() => handleChooseStar(4)}
+                                                    className={styles.comment_box_action_start_item}
+                                                    src={comment?.star >= 4 ? star : nonestar}
+                                                    alt=""
+                                                />
+                                                <Image
+                                                    onClick={() => handleChooseStar(5)}
+                                                    className={styles.comment_box_action_start_item}
+                                                    src={comment?.star >= 5 ? star : nonestar}
+                                                    alt=""
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleSaveComment}
+                                                className={styles.comment_box_action_btn}
+                                            >
+                                                GỬI
+                                            </button>
+                                        </div>
+                                        {image && (
+                                            <Image
+                                                src={URL.createObjectURL(image)}
+                                                alt=""
+                                                width={100}
+                                                height={100}
+                                                className="object-cover w-[100px] h-[100px]"
+                                            />
+                                        )}
+                                    </>
+                                )
+                            ) : (
+                                <div className={styles.comment_box_title}>Hãy mua hàng để có thể đánh giá sản phẩm</div>
+                            ))}
                     </div>
                     <div className={styles.comment_list}>
                         {comments?.map((item: any) => (

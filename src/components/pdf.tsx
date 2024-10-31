@@ -1,10 +1,10 @@
 import { jsPDF } from 'jspdf';
 import Image from 'next/image';
 import html2canvas from 'html2canvas';
-import EditImport from '~/app/admin/edit-import/[id]/page';
 import ExportImport from './export-import/page';
+import ExportExport from './export-export/page';
 
-function Pdf({ importId }: { importId: string }) {
+function Pdf({ id, isExport }: { id: string; isExport: boolean }) {
     const generatePDF = () => {
         const input: any = document.getElementById('pdf-element');
         input.style = 'display: block';
@@ -45,7 +45,7 @@ function Pdf({ importId }: { importId: string }) {
     return (
         <div>
             <div id="pdf-element" style={{ display: 'none' }}>
-                <ExportImport params={{ id: importId }} />
+                {isExport ? <ExportImport params={{ id: id }} /> : <ExportExport params={{ id: id }} />}
             </div>
             <button
                 className="flex items-center border-solid border-[2px] border-[#DB0001] p-2 mr-2 rounded-sm text-[#DB0001]"

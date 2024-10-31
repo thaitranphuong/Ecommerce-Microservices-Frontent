@@ -127,7 +127,7 @@ function TakeOrder() {
             note: note,
             voucherId: voucher.id ?? 0,
             transportFee: shippingFee,
-            total: total,
+            total: Math.round(total),
             userId: getUser().id,
             orderDetails: [],
         };
@@ -148,7 +148,9 @@ function TakeOrder() {
         } else if (payment === 'VNPAY') {
             order.paymentMethod = 1;
             localStorage.setItem('order', JSON.stringify(order));
-            const result = await api.getRequest(`/vnpay/create_payment?amount=${total + shippingFee}&locale=vn`);
+            const result = await api.getRequest(
+                `/vnpay/create_payment?amount=${Math.round(total + shippingFee)}&locale=vn`,
+            );
             if (result && result.statusCode === 200) window.location.href = result.data.url;
             else alert('Lỗi');
         } else {
@@ -371,7 +373,7 @@ function TakeOrder() {
                                 <div className="mb-4 flex justify-between items-center">
                                     <div>Tổng thanh toán:</div>
                                     <div className="text-3xl primary-color">
-                                        ₫{(total + shippingFee).toLocaleString('vi-VN')}
+                                        ₫{Math.round(total + shippingFee).toLocaleString('vi-VN')}
                                     </div>
                                 </div>
                                 {(payment === 'COD' || payment === 'VNPAY') && (

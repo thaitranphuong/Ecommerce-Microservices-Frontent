@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 import logo from '~/../public/images/logo.png';
 import avatar from '~/../public/images/avatar.png';
 import Icon from '@mdi/react';
-import { mdiCartVariant, mdiMenu, mdiMessageText } from '@mdi/js';
+import { mdiCartVariant, mdiMagnify, mdiMenu, mdiMessageText } from '@mdi/js';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { getUser } from '~/utils/localstorage';
@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { cartSelector } from '~/redux/selectors';
 import { getCart } from '~/redux/slice/CartSlice';
 import NavRight from './nav-right';
+import productSearchSlice from '~/redux/slice/ProductSearchSlice';
+import { useRouter } from 'next/navigation';
 const HeaderLoginLink = dynamic(() => import('~/components/layouts/user/header-login-link'), { ssr: false });
 
 function Header() {
@@ -27,6 +29,8 @@ function Header() {
     const cartItems = useSelector(cartSelector);
     const dispatch: any = useDispatch();
     const [isShow, setIsShow] = useState(false);
+    const [productSearchName, setProductSearchName] = useState<string>('');
+    const router = useRouter();
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
@@ -37,6 +41,11 @@ function Header() {
     useEffect(() => {
         scrollToTop();
         setIsShow(false);
+
+        if (pathname !== '/product') {
+            setProductSearchName('');
+            dispatch(productSearchSlice.actions.addProductSearch<any>(''));
+        }
     }, [pathname]);
 
     useEffect(() => {
@@ -69,6 +78,13 @@ function Header() {
         }
     }
 
+    const handleDispatchProductSearchName = () => {
+        if (pathname !== '/product') {
+            router.push('/product');
+        }
+        dispatch(productSearchSlice.actions.addProductSearch<any>(productSearchName));
+    };
+
     return (
         <div>
             <div className="text-xs h-8 bg-[#f6f6f6] flex justify-between items-center px-[130px]  md:hidden sm:hidden">
@@ -81,54 +97,79 @@ function Header() {
                 <HeaderLoginLink />
             </div>
             <div
-                className={clsx('h-[80px] flex justify-between items-center px-[120px] md:px-9 sm:px-9 bg-white', {
-                    ['fixed top-0 w-full animate-showheader shadow-md z-10']: fixed,
+                className={clsx('flex justify-between items-center md:px-9 sm:px-9 bg-white', {
+                    ['fixed top-0 w-full animate-showheader shadow-md z-10 px-[80px] h-[80px]']: fixed,
+                    ['px-[120px] h-[120px]']: !fixed,
                 })}
             >
                 <Link href="/" className="w-[170px]">
                     <Image src={logo} alt=""></Image>
                 </Link>
-                <div className="md:hidden sm:hidden">
-                    <Link
-                        href={'/home'}
-                        className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
-                            ['primary-color']: active === 1,
+                <div className="md:hidden sm:hidden flex flex-col items-center justify-start">
+                    <div
+                        className={clsx('w-full relative', {
+                            ['hidden']: fixed,
                         })}
                     >
-                        TRANG CHỦ
-                    </Link>
-                    <Link
-                        href={'/product'}
-                        className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
-                            ['primary-color']: active === 2,
+                        <input
+                            value={productSearchName}
+                            onChange={(e: any) => setProductSearchName(e.target.value)}
+                            placeholder="Tìm sản phẩm theo tên"
+                            className="mt-10 w-full border-[1px] border-[#ccc] border-solid h-10 pl-5 pr-16 text-gray-600"
+                        />
+                        <button
+                            onClick={handleDispatchProductSearchName}
+                            className="absolute right-[4px] top-[43px] bg-[#12A815] hover:bg-green-800 text-white px-3 py-[5px] rounded-sm  "
+                        >
+                            <Icon path={mdiMagnify} size={1} />
+                        </button>
+                    </div>
+                    <div
+                        className={clsx({
+                            ['mb-5 mt-5']: !fixed,
                         })}
                     >
-                        SẢN PHẨM
-                    </Link>
-                    <Link
-                        href={'/blog'}
-                        className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
-                            ['primary-color']: active === 3,
-                        })}
-                    >
-                        TIN TỨC
-                    </Link>
-                    <Link
-                        href={'/voucher'}
-                        className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
-                            ['primary-color']: active === 4,
-                        })}
-                    >
-                        GIẢM GIÁ
-                    </Link>
-                    <Link
-                        href={'/about'}
-                        className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
-                            ['primary-color']: active === 5,
-                        })}
-                    >
-                        GIỚI THIỆU
-                    </Link>
+                        <Link
+                            href={'/home'}
+                            className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
+                                ['primary-color']: active === 1,
+                            })}
+                        >
+                            TRANG CHỦ
+                        </Link>
+                        <Link
+                            href={'/product'}
+                            className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
+                                ['primary-color']: active === 2,
+                            })}
+                        >
+                            SẢN PHẨM
+                        </Link>
+                        <Link
+                            href={'/blog'}
+                            className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
+                                ['primary-color']: active === 3,
+                            })}
+                        >
+                            TIN TỨC
+                        </Link>
+                        <Link
+                            href={'/voucher'}
+                            className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
+                                ['primary-color']: active === 4,
+                            })}
+                        >
+                            GIẢM GIÁ
+                        </Link>
+                        <Link
+                            href={'/about'}
+                            className={clsx('mx-4 text-sm font-medium font-sans text-[#857b74] hover:primary-color', {
+                                ['primary-color']: active === 5,
+                            })}
+                        >
+                            GIỚI THIỆU
+                        </Link>
+                    </div>
                 </div>
                 <div className="flex md:hidden sm:hidden">
                     {user && (
