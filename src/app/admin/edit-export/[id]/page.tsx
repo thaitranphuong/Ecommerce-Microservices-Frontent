@@ -24,12 +24,30 @@ function EditExport({ params }: { params: { id: string } }) {
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý xuất hàng" detail="Chi tiết phiếu xuất">
                 <div className="flex justify-between w-full">
-                    <strong className="flex justify-between">
-                        &nbsp;&nbsp;Mã phiếu xuất: {_export?.id} &nbsp;|&nbsp; Ngày xuất:{' '}
-                        {_export && convertFromISODateWithTime(_export?.createdTime)}
-                        &nbsp;|&nbsp; <div>{_export?.warehouseName}</div>
-                        &nbsp;|&nbsp; <div>Người xuất: {_export?.userName}</div>
-                    </strong>
+                    <div>
+                        <div className="flex justify-start">
+                            &nbsp;&nbsp;Mã phiếu xuất:&nbsp;<strong>{_export?.id}</strong> &nbsp;|&nbsp; Ngày xuất:
+                            &nbsp;<strong>{_export && convertFromISODateWithTime(_export?.createdTime)}</strong>
+                            &nbsp;|&nbsp;{' '}
+                            <div>
+                                Kho: <strong>{_export?.warehouseName}</strong>
+                            </div>
+                        </div>
+                        <div className="flex justify-start">
+                            &nbsp;&nbsp;{' '}
+                            <div>
+                                Người xuất: <strong>{_export?.userName}</strong>
+                            </div>
+                            &nbsp;|&nbsp;{' '}
+                            <div>
+                                Người nhận: <strong>{_export?.receiverName}</strong>
+                            </div>
+                            &nbsp;|&nbsp;{' '}
+                            <div>
+                                Lý do xuất: <strong>{_export?.reason}</strong>
+                            </div>
+                        </div>
+                    </div>
                     <Pdf id={params.id} isExport={false} />
                 </div>
                 <table

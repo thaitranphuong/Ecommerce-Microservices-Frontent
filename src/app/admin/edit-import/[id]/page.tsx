@@ -25,20 +25,25 @@ function EditImport({ params }: { params: { id: string } }) {
         <div className={styles.wrapper}>
             <Wrapper title="Quản lý nhập hàng" detail="Chi tiết phiếu nhập">
                 <div className="flex justify-between w-full">
-                    <div className="flex justify-between">
-                        &nbsp;&nbsp;Mã phiếu nhập:&nbsp;<strong>{_import?.id}</strong> &nbsp;|&nbsp; Ngày nhập:&nbsp;
-                        <strong>{_import && convertFromISODateWithTime(_import?.createdTime)}</strong>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Kho:&nbsp;<strong>{_import?.warehouseName}</strong>
+                    <div>
+                        <div className="flex justify-start">
+                            &nbsp;&nbsp;Mã phiếu nhập:&nbsp;<strong>{_import?.id}</strong> &nbsp;|&nbsp; Ngày
+                            nhập:&nbsp;
+                            <strong>{_import && convertFromISODateWithTime(_import?.createdTime)}</strong>
+                            &nbsp;|&nbsp;{' '}
+                            <div>
+                                Kho:&nbsp;<strong>{_import?.warehouseName}</strong>
+                            </div>
                         </div>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Người nhập:&nbsp;<strong>{_import?.userName}</strong>
-                        </div>
-                        &nbsp;|&nbsp;{' '}
-                        <div>
-                            Nhà cung cấp:&nbsp;<strong>{_import?.supplierName}</strong>
+                        <div className="flex justify-start">
+                            &nbsp;&nbsp;
+                            <div>
+                                Người nhập:&nbsp;<strong>{_import?.userName}</strong>
+                            </div>
+                            &nbsp;|&nbsp;{' '}
+                            <div>
+                                Nhà cung cấp:&nbsp;<strong>{_import?.supplierName}</strong>
+                            </div>
                         </div>
                     </div>
                     <Pdf id={params.id} isExport={true} />
@@ -52,6 +57,7 @@ function EditImport({ params }: { params: { id: string } }) {
                             <th>Sản phẩm</th>
                             <th>Số lượng</th>
                             <th>Đơn giá</th>
+                            <th>Vị trí trong kho</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,6 +79,7 @@ function EditImport({ params }: { params: { id: string } }) {
                                 <td>
                                     {item.price.toLocaleString('vi-VN')} ₫/<sub>{item.unit}</sub>
                                 </td>
+                                <td>{item.position}</td>
                             </tr>
                         ))}
                     </tbody>

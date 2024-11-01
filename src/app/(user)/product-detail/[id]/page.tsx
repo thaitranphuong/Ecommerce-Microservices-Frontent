@@ -305,8 +305,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                             <div className={styles.product_right_info_text}>{comments.length} Đánh giá</div>
 
                             <div className={styles.product_right_info_text}>
-                                Đã bán {product?.soldQuantity}
-                                {product?.unit}
+                                Đã bán {product?.soldQuantity} {product?.unit}
                             </div>
                         </div>
                         <div className={styles.product_right_price}>

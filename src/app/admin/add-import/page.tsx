@@ -25,6 +25,7 @@ export default function AddImport() {
         price: '',
         productId: '',
         name: '',
+        position: '',
     });
     const [importDetails, setImportDetails] = useState<any>([]);
     const [unit, setUnit] = useState<string>('');
@@ -72,12 +73,16 @@ export default function AddImport() {
             notifyError('Chưa chọn sản phẩm');
             return;
         }
-        if (!importDetail.productId) {
-            notifyError('Chưa nhập số lượng (Khối lượng)');
+        if (!importDetail.quantity) {
+            notifyError('Chưa nhập số lượng');
             return;
         }
-        if (!importDetail.productId) {
+        if (!importDetail.price) {
             notifyError('Chưa nhập đơn giá');
+            return;
+        }
+        if (!importDetail.position) {
+            notifyError('Chưa nhập vị trí trong kho');
             return;
         }
         importDetail.unit = unit;
@@ -89,6 +94,7 @@ export default function AddImport() {
             productId: '',
             unit: '',
             name: '',
+            position: '',
         });
         setUnit('');
     };
@@ -129,29 +135,37 @@ export default function AddImport() {
                 <div className={styles.title}>Thêm chi tiết phiếu nhập</div>
                 <Select
                     value={importDetail?.productId}
-                    width="50%"
+                    width="70%"
                     onChange={handleChooseProduct}
                     name="productId"
                     label="Sản phẩm"
                     array={products}
                 />
                 <Input
-                    width="20%"
+                    width="15%"
                     onChange={handleOnchangeDetail}
                     value={importDetail?.quantity}
                     name="quantity"
-                    label="Số lượng (Khối lượng)"
+                    label="Số lượng"
                     type="number"
                 />
-                <Input width="5%" value={unit} label="Đơn vị" disabled={true} />
+                <Input width="15%" value={unit} label="Đơn vị tính" disabled={true} />
                 <Input
-                    width="25%"
+                    width="70%"
+                    onChange={handleOnchangeDetail}
+                    value={importDetail?.position}
+                    name="position"
+                    label="Vị trí trong kho"
+                />
+                <Input
+                    width="30%"
                     onChange={handleOnchangeDetail}
                     value={importDetail?.price}
                     name="price"
                     label="Đơn giá (VND)"
                     type="number"
                 />
+
                 <button onClick={handleAddDetail} className={styles.btn_add}>
                     Thêm
                 </button>
@@ -163,8 +177,9 @@ export default function AddImport() {
                         <tr>
                             <th>STT</th>
                             <th>Sản phẩm</th>
-                            <th>Số lượng (Khối lượng)</th>
+                            <th>Số lượng</th>
                             <th>Đơn giá</th>
+                            <th>Vị trí</th>
                             <th>Xóa</th>
                         </tr>
                     </thead>
@@ -179,6 +194,7 @@ export default function AddImport() {
                                 <td>
                                     {item.price.toLocaleString('vn-VN')} ₫/<sub>{item.unit}</sub>
                                 </td>
+                                <td>{item.position}</td>
                                 <td>
                                     <div className="flex justify-center" onClick={() => handleRemoveDetail(index)}>
                                         <Icon

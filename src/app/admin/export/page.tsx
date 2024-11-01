@@ -12,6 +12,7 @@ import api from '~/utils/api';
 import { convertFromISODateWithTime, convertToISODate, getCurrentDate } from '~/utils/date-formatter';
 import Input from '~/components/input/input';
 import Skeleton from '~/components/skeleton/skeleton';
+import AddButton from '~/components/add-button/add-button';
 
 function Export() {
     const [exports, setExports] = useState([]);
@@ -55,6 +56,9 @@ function Export() {
                             onChange={(e: any) => setEndTime(e.target.value)}
                             type="date"
                         />
+                    </div>
+                    <div>
+                        <AddButton to="/admin/add-export" />
                     </div>
                 </div>
                 {exports.length === 0 && <Skeleton />}

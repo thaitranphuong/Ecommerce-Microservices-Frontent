@@ -30,10 +30,14 @@ function ViewWarehouse({ params }: { params: { id: string } }) {
                 >
                     <thead>
                         <tr>
-                            <th>STT</th>
-                            <th>Sản phẩm</th>
-                            <th>Đã xuất</th>
-                            <th>Tồn kho</th>
+                            <th rowSpan={2}>STT</th>
+                            <th rowSpan={2}>Sản phẩm</th>
+                            <th rowSpan={2}>Đã xuất</th>
+                            <th colSpan={2}>Tồn kho</th>
+                        </tr>
+                        <tr>
+                            <th>Còn hạn</th>
+                            <th>Hết hạn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,7 +56,10 @@ function ViewWarehouse({ params }: { params: { id: string } }) {
                                     {item.exportedQuantity.toLocaleString('vi-VN')} {item.unit}
                                 </td>
                                 <td>
-                                    {item.remaningQuantity.toLocaleString('vi-VN')} {item.unit}
+                                    {(item.remaningQuantity - item.expiredQuantity).toLocaleString('vi-VN')} {item.unit}
+                                </td>
+                                <td>
+                                    {item.expiredQuantity.toLocaleString('vi-VN')} {item.unit}
                                 </td>
                             </tr>
                         ))}
