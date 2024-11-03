@@ -51,10 +51,23 @@ export default function AddVoucher() {
         <div className={styles.wrapper}>
             {savingModal && <SavingModal />}
             <Wrapper title="Quản lý voucher" detail="Thêm voucher">
-                <Input onChange={handleOnchange} name="name" label="Mã voucher" />
+                <Input onChange={handleOnchange} name="name" label="Tên voucher" />
                 <Input onChange={handleOnchange} name="discountPercent" label="Phần trăm giảm" type="number" />
-                <Input onChange={handleOnchange} name="maxDiscount" label="Giá giảm tối đa (VNĐ)" type="number" />
-                <Input onChange={handleOnchange} name="quantity" label="Số lượng" type="number" />
+                <Input
+                    width="33.33%"
+                    onChange={handleOnchange}
+                    name="minValidPrice"
+                    label="Giá tối thiểu để được giảm (VNĐ)"
+                    type="number"
+                />
+                <Input
+                    onChange={handleOnchange}
+                    width="33.33%"
+                    name="maxDiscount"
+                    label="Giá giảm tối đa (VNĐ)"
+                    type="number"
+                />
+                <Input onChange={handleOnchange} width="33.33%" name="quantity" label="Số lượng" type="number" />
                 <Input onChange={handleOnchange} type="date" name="startTime" label="Thời gian bắt đầu" />
                 <Input onChange={handleOnchange} type="date" name="endTime" label="Thời gian kết thúc" />
                 <SaveButton onClick={handleSave} />

@@ -6,7 +6,6 @@ import Icon from '@mdi/react';
 import Image from 'next/image';
 import VoucherModal from '~/components/voucher-modal';
 import clsx from 'clsx';
-import AddressModal from '~/components/address-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { addressSelector, checkoutSelector, voucherSelector } from '~/redux/selectors';
@@ -14,6 +13,9 @@ import { getUser } from '~/utils/localstorage';
 import { notifyError } from '~/utils/notify';
 import api from '~/utils/api';
 import PayPalButton from '~/components/paypal-button';
+import ListAddressModal from '~/components/list-address-modal/list-address-modal';
+import GetAddress from '~/components/get-address';
+import getAddress from '~/utils/get-address';
 
 function TakeOrder() {
     const [voucherModal, setVoucherModal] = useState<boolean>(false);
@@ -27,7 +29,7 @@ function TakeOrder() {
     const address = useSelector(addressSelector);
 
     const calculateShippingFee = async () => {
-        if (!!address?.district?.DistrictID) {
+        if (!!address?.district) {
             let params = {
                 method: 'POST',
                 headers: {
@@ -37,7 +39,7 @@ function TakeOrder() {
                 body: JSON.stringify({
                     shop_id: 5387453,
                     from_district: 1576,
-                    to_district: address.district.DistrictID,
+                    to_district: address.district,
                 }),
             };
             let res = await fetch(
@@ -57,8 +59,8 @@ function TakeOrder() {
                         insurance_value: 500000,
                         coupon: null,
                         from_district_id: 1576,
-                        to_district_id: address.district.DistrictID,
-                        to_ward_code: address.ward.WardCode,
+                        to_district_id: address.district,
+                        to_ward_code: address.ward + '',
                         height: 15,
                         length: 15,
                         weight: checkoutProducts.reduce((acc: any, item: any) => acc + item.quantity, 0),
@@ -76,6 +78,7 @@ function TakeOrder() {
 
     useEffect(() => {
         calculateShippingFee();
+        console.log(address);
     }, [address]);
 
     let total = voucher.discountPercent
@@ -109,17 +112,16 @@ function TakeOrder() {
         : 0;
 
     const handleCheckout = async () => {
+        const _address = await getAddress({
+            street: address.street,
+            cityId: address.city,
+            districtId: address.district,
+            wardId: address.ward,
+        });
         const order: any = {
             id: 0,
             customerName: address.name,
-            address:
-                address.street +
-                ', ' +
-                address.ward?.WardName +
-                ', ' +
-                address.district?.DistrictName +
-                ', ' +
-                address.city?.ProvinceName,
+            address: _address,
             phoneNumber: address.phone,
             status: 1,
             paymentMethod: 0,
@@ -191,15 +193,12 @@ function TakeOrder() {
                                     {address?.name && address?.name} {address.phone && '(' + address?.phone + ')'}
                                 </div>
                                 <div className="text-gray-700">
-                                    {address?.street
-                                        ? address.street +
-                                          ', ' +
-                                          address.ward?.WardName +
-                                          ', ' +
-                                          address.district?.DistrictName +
-                                          ', ' +
-                                          address.city?.ProvinceName
-                                        : ''}
+                                    <GetAddress
+                                        street={address.street}
+                                        cityId={address.city}
+                                        districtId={address.district}
+                                        wardId={address.ward}
+                                    />
                                 </div>
                                 <button
                                     onClick={() => setAddressModal(true)}
@@ -392,8 +391,15 @@ function TakeOrder() {
                     </div>
                 </div>
             </div>
-            {voucherModal && <VoucherModal setModal={setVoucherModal} />}
-            {addressModal && <AddressModal setModal={setAddressModal} />}
+            {voucherModal && (
+                <VoucherModal
+                    setModal={setVoucherModal}
+                    price={checkoutProducts.reduce((acc: any, item: any) => {
+                        return acc + item.quantity * item.price;
+                    }, 0)}
+                />
+            )}
+            {addressModal && <ListAddressModal setModal={setAddressModal} />}
         </>
     );
 }

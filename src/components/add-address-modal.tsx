@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import addressSlice from '~/redux/slice/AddressSlice';
-import { notifyError } from '~/utils/notify';
+import api from '~/utils/api';
+import { getUser } from '~/utils/localstorage';
+import { notify, notifyError } from '~/utils/notify';
 
-function AddressModal({ setModal }: { setModal: any }) {
+function AddAddressModal({ setModal, getAddresses }: { setModal: any; getAddresses: any }) {
     const [name, setName] = useState<any>('');
     const [phone, setPhone] = useState<any>('');
     const [cities, setCities] = useState<any>([]);
@@ -15,8 +15,6 @@ function AddressModal({ setModal }: { setModal: any }) {
     const [district, setDistrict] = useState<any>('');
     const [ward, setWard] = useState<any>('');
     const [street, setStreet] = useState<any>('');
-
-    const dispatch = useDispatch();
 
     const getCities = async () => {
         const params = {
@@ -79,29 +77,24 @@ function AddressModal({ setModal }: { setModal: any }) {
         setWard(ward);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (!name || !phone || !city || !district || !ward || !street) {
             alert('Chưa nhập đầy đủ thông tin!');
-            console.log({
-                name,
-                phone,
-                city,
-                district,
-                ward,
-                street,
-            });
             return;
         }
-        dispatch(
-            addressSlice.actions.addAddress<any>({
-                name,
-                phone,
-                city,
-                district,
-                ward,
-                street,
-            }),
-        );
+        const data = {
+            name,
+            phone,
+            city: city.ProvinceID,
+            district: district.DistrictID,
+            ward: parseInt(ward.WardCode),
+            userId: getUser().id,
+            street,
+        };
+        const result = await api.postRequest('/address/create', data);
+        if (result?.statusCode === 200) notify('Thêm địa chỉ thành công');
+        else notifyError('Thêm địa chỉ thất bại');
+        getAddresses();
         setModal(false);
     };
 
@@ -115,7 +108,7 @@ function AddressModal({ setModal }: { setModal: any }) {
             <div className="fixed flex justify-center items-center w-full h-full top-0 left-0 z-10">
                 <div className="w-[500px] min-h-10 bg-white rounded-md pb-6">
                     <div className="flex justify-between items-center p-2">
-                        <div className="font-bold">Chọn địa chỉ giao hàng</div>
+                        <div className="font-bold">Thêm địa chỉ giao hàng</div>
                         <button
                             onClick={() => setModal(false)}
                             className="font-bold bg-red-600 text-white w-6 rounded-sm"
@@ -196,4 +189,4 @@ function AddressModal({ setModal }: { setModal: any }) {
     );
 }
 
-export default AddressModal;
+export default AddAddressModal;

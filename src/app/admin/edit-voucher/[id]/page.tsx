@@ -65,7 +65,7 @@ export default function EditVoucher({ params }: { params: { id: string } }) {
         <div className={styles.wrapper}>
             {savingModal && <SavingModal />}
             <Wrapper title="Quản lý voucher" detail="Sửa voucher">
-                <Input value={voucher?.name} onChange={handleOnchange} name="name" label="Mã voucher" />
+                <Input value={voucher?.name} onChange={handleOnchange} name="name" label="Tên voucher" />
                 <Input
                     value={voucher?.discountPercent}
                     onChange={handleOnchange}
@@ -74,6 +74,15 @@ export default function EditVoucher({ params }: { params: { id: string } }) {
                     type="number"
                 />
                 <Input
+                    width="33.33%"
+                    value={voucher?.minValidPrice}
+                    onChange={handleOnchange}
+                    name="minValidPrice"
+                    label="Giá tối thiểu để được giảm (VNĐ)"
+                    type="number"
+                />
+                <Input
+                    width="33.33%"
                     value={voucher?.maxDiscount}
                     onChange={handleOnchange}
                     name="maxDiscount"
@@ -81,6 +90,7 @@ export default function EditVoucher({ params }: { params: { id: string } }) {
                     type="number"
                 />
                 <Input
+                    width="33.33%"
                     value={voucher?.quantity}
                     onChange={handleOnchange}
                     name="quantity"

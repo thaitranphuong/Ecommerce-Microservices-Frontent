@@ -86,8 +86,9 @@ function Voucher() {
                             <thead>
                                 <tr>
                                     <th>STT</th>
-                                    <th>Mã voucher</th>
+                                    <th>Tên voucher</th>
                                     <th>Chỉ số giảm</th>
+                                    <th>Giá tối thiểu</th>
                                     <th>Giảm tối đa</th>
                                     <th>Số lượng</th>
                                     <th>Còn lại</th>
@@ -103,7 +104,14 @@ function Voucher() {
                                             <td>{index + 1 + (page - 1) * 5}</td>
                                             <td>{item.name}</td>
                                             <td>{item.discountPercent}%</td>
-                                            <td>{item.maxDiscount.toLocaleString('vi-VN')} đ</td>
+                                            <td>
+                                                {item.minValidPrice.toLocaleString('vi-VN')}
+                                                <sup>đ</sup>
+                                            </td>
+                                            <td>
+                                                {item.maxDiscount.toLocaleString('vi-VN')}
+                                                <sup>đ</sup>
+                                            </td>
                                             <td>{item.quantity}</td>
                                             <td>{item.quantity - item.usedQuantity}</td>
                                             <td>{convertFromISODate(item.startTime)}</td>

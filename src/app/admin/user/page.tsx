@@ -32,7 +32,6 @@ function User() {
         setTotalpage(result.data.totalPage);
         setPage(result.data.page);
         setUsers(result.data.listResult);
-        console.log(result);
     };
 
     useEffect(() => {

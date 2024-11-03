@@ -22,7 +22,7 @@
         }
 
         .user_list {
-            height: 100%;
+            height: calc(100vh - 285px);
             flex-direction: column;
             width: 100%;
             overflow-y: scroll;

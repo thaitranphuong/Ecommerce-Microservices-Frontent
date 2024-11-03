@@ -192,7 +192,14 @@ export default function Cart() {
                     </div>
                 </div>
             </div>
-            {modal && <VoucherModal setModal={setModal} />}
+            {modal && (
+                <VoucherModal
+                    setModal={setModal}
+                    price={checkoutProducts.reduce((acc: any, item: any) => {
+                        return acc + item.quantity * item.price;
+                    }, 0)}
+                />
+            )}
         </div>
     );
 }

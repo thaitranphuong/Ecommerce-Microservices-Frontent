@@ -116,7 +116,7 @@ function Home() {
         },
     };
 
-    const getDate = async (selectedDate: any, endDate: any, orderType: any) => {
+    const getDate = async (selectedDate: any, endDate: any, orderType: any, userId: string) => {
         let result: any = [];
         if (orderType === 'day') {
             result = await api.getRequest(
@@ -130,7 +130,11 @@ function Home() {
                     selectedDate,
                 )}`,
             );
-        else result = await api.getRequest(`/order/find-all-by-year-to-statistic?year=${getYearFromISO(selectedDate)}`);
+        else if (orderType === 'year')
+            result = await api.getRequest(`/order/find-all-by-year-to-statistic?year=${getYearFromISO(selectedDate)}`);
+        else if (orderType === 'user')
+            result = await api.getRequest(`/order/get-all-of-customer-page?status=0&userId=${userId}`);
+
         if (result?.statusCode === 200) {
             const data = [0, 0, 0, 0, 0];
             result.data.forEach((order: any) => {
@@ -230,7 +234,7 @@ function Home() {
                     <div className={styles.card_top}>
                         <div className={styles.card_left}>
                             <div className={styles.card_left_quantity}>{pendingOrdersInMonth?.length ?? 0}</div>
-                            <div className={styles.card_title}>Đơn hàng</div>
+                            <div className={styles.card_title}>Đơn hàng mới</div>
                         </div>
                         <div style={{ backgroundColor: '#721ce9' }} className={styles.card_right}>
                             <Icon path={mdiTextBox} size={2} />

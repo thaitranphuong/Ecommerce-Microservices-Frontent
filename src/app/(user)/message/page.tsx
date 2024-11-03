@@ -29,7 +29,7 @@ function Message() {
         connected: false,
         message: '',
         avatar: getUser().avatar,
-        roles: getUser().roles,
+        isAdmin: getUser().isAdmin,
     });
     const [image, setImage] = useState<any>();
     const [isUploadImage, setIsUploadImage] = useState<boolean>(false);
@@ -72,7 +72,7 @@ function Message() {
         if (connected === false) {
             connected = true;
             let url = '';
-            userData.roles.includes('admin')
+            userData.isAdmin
                 ? (url = config.baseURL + '/user/get-all-customer')
                 : (url = config.baseURL + '/user/get-all-admin');
 
