@@ -50,8 +50,8 @@ export default function EditUnit({ params }: { params: { id: string } }) {
     return (
         <div className={styles.wrapper}>
             {savingModal && <SavingModal />}
-            <Wrapper title="Quản lý danh mục" detail="Thêm danh mục">
-                <Input value={unit?.name} onChange={handleOnchange} name="name" label="Tên danh mục" />
+            <Wrapper title="Quản lý đơn vị tính" detail="Sửa đơn vị tính">
+                <Input value={unit?.name} onChange={handleOnchange} name="name" label="Tên đơn vị tính" />
                 <SaveButton onClick={handleSave} />
             </Wrapper>
         </div>

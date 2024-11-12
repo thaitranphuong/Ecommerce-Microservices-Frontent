@@ -39,7 +39,7 @@ export default function AddUnit() {
     return (
         <div className={styles.wrapper}>
             {savingModal && <SavingModal />}
-            <Wrapper title="Quản lý danh mục" detail="Thêm danh mục">
+            <Wrapper title="Quản lý đơn vị tính" detail="Thêm đơn vị tính">
                 <Input onChange={handleOnchange} name="name" label="Đơn vị tính" />
                 <SaveButton onClick={handleSave} />
             </Wrapper>

@@ -14,7 +14,10 @@ export default function Info() {
     const [savingModal, setSavingModal] = useState<boolean>(false);
 
     useEffect(() => {
-        setCurrentUser(getUser());
+        setCurrentUser({
+            ...getUser(),
+            gender: getUser().gender ? 'true' : 'false',
+        });
     }, []);
 
     const handleChangeInput = (e: any) => {
@@ -57,7 +60,7 @@ export default function Info() {
         }
         !user.phone ? (user.phone = '-') : 1;
         !user.address ? (user.address = '-') : 1;
-        user.gender == 'false' ? (user.gender = false) : (user.gender = true);
+        user.gender == 'true' ? (user.gender = true) : (user.gender = false);
         user.birthDay === '0001-01-01T00:00:00' ? (user.birthDay = '2000-01-01') : 1;
         user.birthDay = convertToISODate(user.birthDay);
         console.log(user.birthDay);
@@ -101,17 +104,6 @@ export default function Info() {
                         id="phone"
                         placeholder="Số điện thoại"
                     />
-                    <label className="block mt-5 text-gray-600" htmlFor="address">
-                        Địa chỉ
-                    </label>
-                    <input
-                        onChange={handleChangeInput}
-                        value={user.address}
-                        name="address"
-                        className="block border-solid border-[1px] border-[#ccc] rounded-sm px-2 py-1 w-full mt-1"
-                        id="address"
-                        placeholder="Địa chỉ"
-                    />
                     <label className="block mt-5 text-gray-600" htmlFor="birthDay">
                         Ngày sinh
                     </label>
@@ -134,7 +126,7 @@ export default function Info() {
                         id="gender"
                     >
                         <option value={'true'}>Nam</option>
-                        <option value={'fasle'}>Nữ</option>
+                        <option value={'false'}>Nữ</option>
                     </select>
                     <button
                         onClick={handleSubmit}

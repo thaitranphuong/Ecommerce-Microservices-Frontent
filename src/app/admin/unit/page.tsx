@@ -58,7 +58,7 @@ function Unit() {
     };
     return (
         <div className={styles.wrapper}>
-            <Wrapper title="Quản lý danh mục" detail="Danh sách danh mục">
+            <Wrapper title="Quản lý đơn vị tính" detail="Danh sách đơn vị tính">
                 <div
                     style={{
                         width: '100%',
